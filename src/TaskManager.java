@@ -49,26 +49,30 @@ public class TaskManager {
         return subtasks.get(id);
     }
 
-    public void addTask(Task task) {
+    public int addTask(Task task) {
         int newId = generateId();
         task.setId(newId);
         tasks.put(newId, task);
+        return newId;
     }
 
-    public void addEpic(Epic epic) {
+    public int addEpic(Epic epic) {
         int newId = generateId();
         epic.setId(newId);
         epics.put(newId, epic);
         updateEpicStatus(newId);
+        return newId;
     }
 
-    public void addSubTask(Subtask subtask) {
+    public int addSubTask(Subtask subtask) {
         int newId = generateId();
         subtask.setId(newId);
         subtasks.put(newId, subtask);
-        int realtedEpicId = subtask.getEpicId();
-        Epic relatedEpic = epics.get(realtedEpicId);
+        int relatedEpicId = subtask.getEpicId();
+        Epic relatedEpic = epics.get(relatedEpicId);
         relatedEpic.addSubTask(newId);
+        updateEpicStatus(relatedEpicId);
+        return newId;
     }
 
     public void updateTask(Task task) {
@@ -103,9 +107,11 @@ public class TaskManager {
     public void removeSubtaskById(int id) {
         var subtask = subtasks.get(id);
         if (subtask != null) {
-            var relatedEpic = subtask.getEpicId();
+            var relatedEpicId = subtask.getEpicId();
+            var relatedEpic = epics.get(relatedEpicId);
             subtasks.remove(id);
-            updateEpicStatus(relatedEpic);
+            relatedEpic.removeSubtaskById(id);
+            updateEpicStatus(relatedEpicId);
         }
     }
 
@@ -124,6 +130,7 @@ public class TaskManager {
             var epicSubtasksIds = getEpicSubtasks(epicId);
             if (epicSubtasksIds.isEmpty()) {
                 epic.setStatus(TaskStatus.NEW);
+                return;
             }
             boolean isAllSubtasksNew = true;
             boolean isAllSubtasksDone = true;
@@ -156,5 +163,15 @@ public class TaskManager {
 
     private int generateId() {
         return ++id;
+    }
+
+    @Override
+    public String toString() {
+        return "TaskManager{" +
+                "id=" + id +
+                ", tasks=" + tasks +
+                ", epics=" + epics +
+                ", subtasks=" + subtasks +
+                '}';
     }
 }
