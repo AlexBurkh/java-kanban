@@ -3,9 +3,9 @@ import java.util.HashMap;
 
 public class TaskManager {
     private int id = 0;
-    HashMap<Integer, Task> tasks;
-    HashMap<Integer, Epic> epics;
-    HashMap<Integer, Subtask> subtasks;
+    private HashMap<Integer, Task> tasks;
+    private HashMap<Integer, Epic> epics;
+    private HashMap<Integer, Subtask> subtasks;
 
     public TaskManager() {
         tasks = new HashMap<>();
@@ -31,10 +31,15 @@ public class TaskManager {
 
     public void clearEpics() {
         epics.clear();
+        subtasks.clear();
     }
 
     public void clearSubtasks() {
         subtasks.clear();
+        for (Epic epic : epics.values()) {
+            epic.clearSubtasks();
+            updateEpicStatus(epic.getId());
+        }
     }
 
     public Task getTaskById(int id) {
@@ -50,24 +55,24 @@ public class TaskManager {
     }
 
     public int addTask(Task task) {
-        int newId = generateId();
+        int newId = generateId(); // Сделал для удобства использования возврат этого id из метода
         task.setId(newId);
-        tasks.put(newId, task);
+        tasks.put(task.getId(), task);
         return newId;
     }
 
     public int addEpic(Epic epic) {
-        int newId = generateId();
+        int newId = generateId(); // Сделал для удобства использования возврат этого id из метода
         epic.setId(newId);
-        epics.put(newId, epic);
+        epics.put(epic.getId(), epic);
         updateEpicStatus(newId);
         return newId;
     }
 
     public int addSubTask(Subtask subtask) {
-        int newId = generateId();
+        int newId = generateId(); // Сделал для удобства использования возврат этого id из метода
         subtask.setId(newId);
-        subtasks.put(newId, subtask);
+        subtasks.put(subtask.getId(), subtask);
         int relatedEpicId = subtask.getEpicId();
         Epic relatedEpic = epics.get(relatedEpicId);
         relatedEpic.addSubTask(newId);
@@ -115,7 +120,7 @@ public class TaskManager {
         }
     }
 
-    private ArrayList<Integer> getEpicSubtasks(int epicId) {
+    public ArrayList<Integer> getEpicSubtasks(int epicId) {
         var epic = epics.get(epicId);
         if (epic != null) {
             return epic.getSubTasks();
