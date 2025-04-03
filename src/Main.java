@@ -1,6 +1,9 @@
 public class Main {
     public static void main(String[] args) {
-        InMemoryTaskManager tm = new InMemoryTaskManager();
+        Managers managers = new Managers();
+
+        TaskManager tm = managers.getDefault();
+
         var taskId = tm.addTask(new Task("домашка", "сделать финальный проект спринта 4",
                 TaskStatus.NEW));
         var epic1Id = tm.addEpic(new Epic("курс Java", "пройти курс Java"));
