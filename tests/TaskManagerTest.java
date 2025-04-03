@@ -28,6 +28,27 @@ class TaskManagerTest {
     }
 
     @Test
+    public void shouldEqualsTasksInHMAndTM() {
+        HistoryManager hm = tm.getHistoryManager();
+        var taskFromTM = tm.getTaskById(1);
+        var taskFromHM = hm.getHistory().getFirst();
+        assertEquals(taskFromTM.getId(), taskFromHM.getId());
+        assertEquals(taskFromTM.getStatus(), taskFromHM.getStatus());
+        assertEquals(taskFromTM.getName(), taskFromHM.getName());
+        assertEquals(taskFromTM.getDescription(), taskFromHM.getDescription());
+    }
+
+    @Test
+    public void shouldNoChangeTaskWhenAddingInTM() {
+        var task = new Task("task555", "test task555", TaskStatus.NEW);
+        var id = tm.addTask(task);
+        var taskFromTM = tm.getTaskById(id);
+        assertEquals(task.getName(), taskFromTM.getName());
+        assertEquals(task.getDescription(), taskFromTM.getDescription());
+        assertEquals(task.getStatus(), taskFromTM.getStatus());
+    }
+
+    @Test
     public void shouldIncrementCounterWithDiffersTasks() {
         assertEquals(17, tm.getCurrentId(), "Некорректно изменяется текущий id задачи");
     }
@@ -51,6 +72,12 @@ class TaskManagerTest {
         tm.removeSubtaskById(10);
         tm.removeSubtaskById(11);
         assertEquals(TaskStatus.NEW, tm.getEpicById(2).getStatus());
+    }
+
+    @Test
+    public void shouldDecreaseTasksSize() {
+        tm.removeTaskById(1);
+        assertEquals(5, tm.getTasks().size());
     }
 
     @Test
@@ -97,6 +124,7 @@ class TaskManagerTest {
     public void shouldChangeSizeToZero() {
         tm.clearEpics();
         tm.clearTasks();
+        tm.clearSubtasks();
         assertEquals(0, tm.getTasks().size());
         assertEquals(0, tm.getEpics().size());
         assertEquals(0, tm.getSubTasks().size());

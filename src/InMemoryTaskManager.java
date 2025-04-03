@@ -214,6 +214,10 @@ public class InMemoryTaskManager implements TaskManager {
         return ++id;
     }
 
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
+
     @Override
     public String toString() {
         return "TaskManager{" +
