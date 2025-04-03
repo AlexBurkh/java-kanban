@@ -1,6 +1,7 @@
 public class Main {
     public static void main(String[] args) {
-        TaskManager tm = new TaskManager();
+        TaskManager tm = Managers.getDefault();
+
         var taskId = tm.addTask(new Task("домашка", "сделать финальный проект спринта 4",
                 TaskStatus.NEW));
         var epic1Id = tm.addEpic(new Epic("курс Java", "пройти курс Java"));
