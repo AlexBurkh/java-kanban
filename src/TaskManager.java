@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {
-    HistoryManager getHistoryManager();
     int getCurrentId();
     List<Task> getHistory();
     ArrayList<Task> getTasks();

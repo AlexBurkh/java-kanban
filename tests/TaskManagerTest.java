@@ -28,17 +28,6 @@ class TaskManagerTest {
     }
 
     @Test
-    public void shouldEqualsTasksInHMAndTM() {
-        HistoryManager hm = tm.getHistoryManager();
-        var taskFromTM = tm.getTaskById(1);
-        var taskFromHM = hm.getHistory().getFirst();
-        assertEquals(taskFromTM.getId(), taskFromHM.getId());
-        assertEquals(taskFromTM.getStatus(), taskFromHM.getStatus());
-        assertEquals(taskFromTM.getName(), taskFromHM.getName());
-        assertEquals(taskFromTM.getDescription(), taskFromHM.getDescription());
-    }
-
-    @Test
     public void shouldNoChangeTaskWhenAddingInTM() {
         var task = new Task("task555", "test task555", TaskStatus.NEW);
         var id = tm.addTask(task);

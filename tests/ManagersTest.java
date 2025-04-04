@@ -15,6 +15,5 @@ class ManagersTest {
         assertNotNull(tm.getTasks());
         assertNotNull(tm.getSubTasks());
         assertNotNull(tm.getEpics());
-        assertNotNull(tm.getHistoryManager());
     }
 }

@@ -9,8 +9,8 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Subtask> subtasks;
     private final HistoryManager historyManager;
 
-    public InMemoryTaskManager(HistoryManager hm) {
-        historyManager = hm;
+    public InMemoryTaskManager() {
+        historyManager = Managers.getDefaultHistory();
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subtasks = new HashMap<>();
@@ -212,10 +212,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     private int generateId() {
         return ++id;
-    }
-
-    public HistoryManager getHistoryManager() {
-        return historyManager;
     }
 
     @Override

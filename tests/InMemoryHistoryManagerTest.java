@@ -46,6 +46,6 @@ class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldDeleteOldHistoryRecords() {
-        assertEquals(2, tm.getHistory().getLast().getId(), "Из истории не удалился старый элемент");
+        assertEquals(2, tm.getHistory().getFirst().getId(), "Из истории не удалился старый элемент");
     }
 }
