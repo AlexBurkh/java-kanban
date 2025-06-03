@@ -1,21 +1,34 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private static final int MAX_HISTORY_SIZE = 10;
-    private final List<Task> history;
+    private static final LinkedList<Task> history = new LinkedList<>();
+    private static final HashMap<Integer, Integer> historyNodesIdentifiers = new HashMap<>();
+    private int nextId = 0;
 
     public InMemoryHistoryManager() {
-        this.history = new ArrayList<>(MAX_HISTORY_SIZE);
+
     }
 
     @Override
     public void add(Task task) {
-        if (history.size() < MAX_HISTORY_SIZE) {
-            history.add(task);
-        } else {
-            history.removeFirst();
-            history.add(task);
+        Integer oldId = historyNodesIdentifiers.get(task.getId());
+        if (oldId != null) {
+            remove(oldId);
+        }
+        historyNodesIdentifiers.put(task.getId(), nextId++);
+        history.add(task);
+    }
+
+    @Override
+    public void remove(int id) {
+        Integer index = historyNodesIdentifiers.get(id);
+        if (index != null) {
+            history.remove(index);
+            historyNodesIdentifiers.remove(id);
+            nextId--;
         }
     }
 
