@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,12 +23,10 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        Integer index = historyNodesIdentifiers.get(id);
-        if (index != null) {
-            history.remove(index);
-            historyNodesIdentifiers.remove(id);
-            nextId--;
-        }
+        int index = historyNodesIdentifiers.get(id);
+        history.remove(index);
+        historyNodesIdentifiers.remove(id);
+        nextId--;
     }
 
     @Override
