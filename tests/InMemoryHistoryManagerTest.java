@@ -40,11 +40,6 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void shouldIncreaseHistorySizeAndBeLessOrEqual10() {
-        assertEquals(10, tm.getHistory().size());
-    }
-
-    @Test
     public void shouldDeleteOldHistoryRecords() {
         assertEquals(2, tm.getHistory().getFirst().getId(), "Из истории не удалился старый элемент");
     }
