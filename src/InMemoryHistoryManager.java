@@ -7,6 +7,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node head = null;
     private Node tail = null;
     int size = 0;
+
     private class Node {
         Node prev;
         Node next;
@@ -85,7 +86,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private List<Task> getTasks() {
         var result = new ArrayList<Task>(size);
         var node = head;
-        while(node != null) {
+        while (node != null) {
             result.add(node.data);
             node = node.next;
         }
