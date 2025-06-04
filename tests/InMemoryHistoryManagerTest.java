@@ -1,8 +1,9 @@
-import org.junit.Test;
 import org.junit.Before;
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class InMemoryHistoryManagerTest {
     private final static TaskManager tm = Managers.getDefault();
