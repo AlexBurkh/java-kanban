@@ -21,7 +21,7 @@ public class Main {
         tm.getTaskById(1);
         tm.getSubTaskById(4);
         tm.getEpicById(7);
-        tm.getTaskById(1); // подробнее посмотреть удаление ноды
+        tm.getSubTaskById(4); // подробнее посмотреть удаление ноды
         tm.removeSubtaskById(subtask4Id);
         tm.removeEpicById(epic2Id);
         tm.removeTaskById(taskId);
