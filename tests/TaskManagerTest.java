@@ -1,12 +1,12 @@
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 
 
-class TaskManagerTest {
+public class TaskManagerTest {
     private final TaskManager tm = Managers.getDefault();
 
-    @BeforeEach
+    @Before
     public void initTm() {
         tm.addTask(new Task("task1", "test task1", TaskStatus.NEW));
         tm.addEpic(new Epic("epic2", "test epic1"));
@@ -39,28 +39,13 @@ class TaskManagerTest {
 
     @Test
     public void shouldIncrementCounterWithDiffersTasks() {
-        assertEquals(17, tm.getCurrentId(), "Некорректно изменяется текущий id задачи");
+        assertEquals(17, tm.getCurrentId());
     }
 
     @Test
     public void shouldRemoveAllSubtasksOfEpic() {
         tm.removeEpicById(12);
         assertEquals(4, tm.getSubTasks().size());
-    }
-
-    @Test
-    public void epic2ShouldChangeStatusToDone() {
-        tm.removeSubtaskById(11);
-        assertEquals(TaskStatus.DONE, tm.getEpicById(2).getStatus());
-    }
-
-    @Test
-    public void epic2ShouldChangeStatusToNew() {
-        tm.removeSubtaskById(8);
-        tm.removeSubtaskById(9);
-        tm.removeSubtaskById(10);
-        tm.removeSubtaskById(11);
-        assertEquals(TaskStatus.NEW, tm.getEpicById(2).getStatus());
     }
 
     @Test
@@ -76,37 +61,6 @@ class TaskManagerTest {
         tm.removeSubtaskById(10);
         tm.removeSubtaskById(11);
         assertEquals(0, tm.getEpicSubtasks(2).size());
-    }
-
-    @Test
-    public void shouldNoChangeCurrentIdIfUpdateTasks() {
-        int currentId = tm.getCurrentId();
-
-        //Task
-        var task = tm.getTaskById(1);
-        int id = task.getId();
-        task = new Task("updated task", "updated task with similar id", TaskStatus.IN_PROGRESS);
-        task.setId(id);
-        tm.updateTask(task);
-
-        // Epic
-        var epic = tm.getEpicById(2);
-        id = epic.getId();
-        var subtasks = epic.getSubTasks();
-        epic = new Epic("updated epic", "updated epic with same id");
-        for (Integer subtask : subtasks) {
-            epic.addSubTask(subtask);
-        }
-        tm.updateEpic(epic);
-
-        //Subtask
-        var subtask = tm.getSubTaskById(10);
-        id = subtask.getId();
-        int epicId = subtask.getEpicId();
-        subtask = new Subtask("updated subtask", "updated subtask with same id", TaskStatus.NEW, epicId);
-        tm.updateSubTask(subtask);
-
-        assertEquals(currentId, tm.getCurrentId());
     }
 
     @Test

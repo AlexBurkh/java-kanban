@@ -1,10 +1,10 @@
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class SubtaskTest {
+public class SubtaskTest {
     @Test
-    void testSubtasksEquals() {
+    public void testSubtasksEquals() {
         var epic = new Epic("epic2", "test epic1");
         epic.setId(1);
         var subtask1 = new Subtask("subtask8", "test subtask", TaskStatus.DONE, 2);

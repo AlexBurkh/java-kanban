@@ -1,10 +1,9 @@
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class EpicTest {
+public class EpicTest {
     @Test
-    void testEpicEquals() {
+    public void testEpicEquals() {
         var epic1 = new Epic("epic1", "test epic1");
         epic1.setId(1);
         var epic2 = new Epic("epic2", "test epic2");
@@ -15,7 +14,7 @@ class EpicTest {
     }
 
     @Test
-    void shouldNoAddedSubtaskWithIdAsIsItsOwn() {
+    public void shouldNoAddedSubtaskWithIdAsIsItsOwn() {
         var epic = new Epic("epic1", "test epic1");
         epic.setId(1);
         epic.addSubTask(1);

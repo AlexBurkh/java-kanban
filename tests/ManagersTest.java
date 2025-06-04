@@ -1,8 +1,8 @@
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class ManagersTest {
+public class ManagersTest {
     @Test
     public void shouldReturnInitializedHistoryManager() {
         var hm = Managers.getDefaultHistory();

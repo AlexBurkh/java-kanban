@@ -1,16 +1,14 @@
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class InMemoryHistoryManagerTest {
+public class InMemoryHistoryManagerTest {
     private final static TaskManager tm = Managers.getDefault();
 
-    @BeforeAll
-    public static void initTm() {
+    @Before
+    public void initTM() {
         tm.addTask(new Task("task1", "test task1", TaskStatus.NEW));
         tm.addEpic(new Epic("epic2", "test epic1"));
         tm.addTask(new Task("task3", "test task2", TaskStatus.NEW));
@@ -28,7 +26,6 @@ class InMemoryHistoryManagerTest {
         tm.addSubTask(new Subtask("subtask15", "test subtask", TaskStatus.NEW, 12));
         tm.addSubTask(new Subtask("subtask16", "test subtask", TaskStatus.NEW, 12));
         tm.addSubTask(new Subtask("subtask17", "test subtask", TaskStatus.NEW, 12));
-
         tm.getTaskById(1);
         tm.getEpicById(2);
         tm.getTaskById(3);
