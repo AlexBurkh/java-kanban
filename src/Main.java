@@ -18,6 +18,10 @@ public class Main {
                 epic2Id));
         var subtask6Id = tm.addSubTask(new Subtask("Парсеры", "Доделать парсеры", TaskStatus.NEW,
                 epic2Id));
+        tm.getTaskById(1);
+        tm.getSubTaskById(4);
+        tm.getEpicById(7);
+        tm.getSubTaskById(4); // подробнее посмотреть удаление ноды
         tm.removeSubtaskById(subtask4Id);
         tm.removeEpicById(epic2Id);
         tm.removeTaskById(taskId);

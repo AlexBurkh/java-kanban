@@ -1,13 +1,15 @@
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
 
-class InMemoryHistoryManagerTest {
-    private final TaskManager tm = Managers.getDefault();
+import static org.junit.Assert.assertEquals;
 
-    @BeforeEach
-    public void initTm() {
+public class InMemoryHistoryManagerTest {
+    private final static TaskManager tm = Managers.getDefault();
+
+    @Before
+    public void initTM() {
         tm.addTask(new Task("task1", "test task1", TaskStatus.NEW));
         tm.addEpic(new Epic("epic2", "test epic1"));
         tm.addTask(new Task("task3", "test task2", TaskStatus.NEW));
@@ -25,27 +27,52 @@ class InMemoryHistoryManagerTest {
         tm.addSubTask(new Subtask("subtask15", "test subtask", TaskStatus.NEW, 12));
         tm.addSubTask(new Subtask("subtask16", "test subtask", TaskStatus.NEW, 12));
         tm.addSubTask(new Subtask("subtask17", "test subtask", TaskStatus.NEW, 12));
-
         tm.getTaskById(1);
         tm.getEpicById(2);
         tm.getTaskById(3);
         tm.getSubTaskById(8);
         tm.getSubTaskById(9);
         tm.getSubTaskById(10);
-        tm.getSubTaskById(14);
+        tm.getTaskById(1);
         tm.getSubTaskById(15);
         tm.getSubTaskById(16);
+        tm.getSubTaskById(17);
         tm.getEpicById(12);
         tm.getTaskById(5);
     }
 
     @Test
-    public void shouldIncreaseHistorySizeAndBeLessOrEqual10() {
-        assertEquals(10, tm.getHistory().size());
+    public void shouldHaveFirstIdEquals2() {
+        List<Task> history = tm.getHistory();
+        assertEquals(2, history.getFirst().getId());
     }
 
     @Test
-    public void shouldDeleteOldHistoryRecords() {
-        assertEquals(2, tm.getHistory().getFirst().getId(), "Из истории не удалился старый элемент");
+    public void shouldHaveLastIdEquals5() {
+        tm.getTaskById(5);
+        List<Task> history = tm.getHistory();
+        assertEquals(5, history.getLast().getId());
+    }
+
+    @Test
+    public void shouldHaveHistoryLengthEquals11() {
+        List<Task> history = tm.getHistory();
+        assertEquals(11, history.size());
+    }
+
+    @Test
+    public void shouldHaveLastIdEquals15AndSize11() {
+        tm.getSubTaskById(15);
+        List<Task> history = tm.getHistory();
+        assertEquals(15, history.getLast().getId());
+        assertEquals(11, history.size());
+    }
+
+    @Test
+    public void shouldReplaceTailNodeInHistoryForSameTask() {
+        tm.getTaskById(5);
+        tm.getTaskById(5);
+        List<Task> history = tm.getHistory();
+        assertEquals(5, history.getLast().getId());
     }
 }
