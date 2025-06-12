@@ -186,7 +186,7 @@ public class InMemoryTaskManager implements TaskManager {
             for (Integer epicSubtaskId : epicSubtasksIds) {
                 var subtask = subtasks.get(epicSubtaskId);
                 if (subtask != null) {
-                    switch(subtask.getStatus()) {
+                    switch (subtask.getStatus()) {
                         case NEW:
                             isAllSubtasksDone = false;
                             break;

@@ -1,5 +1,3 @@
-import java.util.Objects;
-
 import static java.util.Objects.hash;
 
 public class Task {
@@ -25,9 +23,9 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", id=" + id +
                 ", status=" + status +
                 '}';
     }
