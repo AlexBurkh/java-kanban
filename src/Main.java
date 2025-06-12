@@ -1,6 +1,6 @@
 public class Main {
     public static void main(String[] args) {
-        TaskManager tm = Managers.getDefault();
+        TaskManager tm = new FileBackedTaskManager("D:\\test");
 
         var taskId = tm.addTask(new Task("домашка", "сделать финальный проект спринта 4",
                 TaskStatus.NEW));
