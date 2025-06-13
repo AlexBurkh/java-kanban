@@ -1,6 +1,9 @@
+import java.io.File;
+
 public class Main {
     public static void main(String[] args) {
-        TaskManager tm = new FileBackedTaskManager("D:\\test");
+        File file = new File("D:\\test");
+        TaskManager tm = FileBackedTaskManager.loadFromFile(file);
 
         var taskId = tm.addTask(new Task("домашка", "сделать финальный проект спринта 4",
                 TaskStatus.NEW));
