@@ -20,7 +20,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return id;
     }
 
-    static FileBackedTaskManager loadFromFile(File file) {
+    public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager fbm = new FileBackedTaskManager(file);
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
