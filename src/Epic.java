@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
     private ArrayList<Integer> subtasksId;
@@ -8,10 +9,14 @@ public class Epic extends Task {
         subtasksId = new ArrayList<>();
     }
 
-    @Override
-    public String toString() {
-        return "Epic{id=" + id + ", title=" + name + ", description=" + description + ", status=" + status
-                + ", subtasksId=" + subtasksId + "}";
+    public static Epic importEpicFromTask(Task task, List<Integer> subtasks) {
+        Epic e = new Epic(task.name, task.description);
+        e.setId(task.getId());
+        e.setStatus(task.getStatus());
+        for (var subtask : subtasks) {
+            e.addSubTask(subtask);
+        }
+        return e;
     }
 
     public ArrayList<Integer> getSubTasks() {

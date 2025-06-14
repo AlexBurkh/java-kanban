@@ -6,6 +6,12 @@ public class Subtask extends Task {
         setEpicId(epicId);
     }
 
+    public static Subtask importSubtask(Task task, int epicId) {
+        Subtask st = new Subtask(task.getName(), task.getDescription(), task.getStatus(), epicId);
+        st.setId(task.getId());
+        return st;
+    }
+
     public int getEpicId() {
         return epicId;
     }
@@ -14,11 +20,5 @@ public class Subtask extends Task {
         if (this.id != id) {
             epicId = id;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Subtask{id=" + id + ", title=" + name + ", description=" + description + ", status=" + status
-                + ", epicId=" + epicId + "}";
     }
 }

@@ -3,10 +3,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int id = 0;
-    private final HashMap<Integer, Task> tasks;
-    private final HashMap<Integer, Epic> epics;
-    private final HashMap<Integer, Subtask> subtasks;
+    protected int id = 0;
+    protected final HashMap<Integer, Task> tasks;
+    protected final HashMap<Integer, Epic> epics;
+    protected final HashMap<Integer, Subtask> subtasks;
     private final HistoryManager historyManager;
 
     public InMemoryTaskManager() {
@@ -112,8 +112,10 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.put(subtask.getId(), subtask);
         int relatedEpicId = subtask.getEpicId();
         Epic relatedEpic = epics.get(relatedEpicId);
-        relatedEpic.addSubTask(newId);
-        updateEpicStatus(relatedEpicId);
+        if (relatedEpic != null) {
+            relatedEpic.addSubTask(newId);
+            updateEpicStatus(relatedEpicId);
+        }
         return newId;
     }
 
@@ -212,15 +214,5 @@ public class InMemoryTaskManager implements TaskManager {
 
     private int generateId() {
         return ++id;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskManager{" +
-                "id=" + id +
-                ", tasks=" + tasks +
-                ", epics=" + epics +
-                ", subtasks=" + subtasks +
-                '}';
     }
 }
