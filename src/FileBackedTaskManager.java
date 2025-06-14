@@ -20,6 +20,43 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return id;
     }
 
+    static FileBackedTaskManager loadFromFile(File file) {
+        FileBackedTaskManager fbm = new FileBackedTaskManager(file);
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                int counter = 0;
+                while ((line = reader.readLine()) != null) {
+                    if (counter != 0) {
+                        Task t = fromString(line);
+                        if (t != null) {
+                            if (fbm.id < t.getId()) {
+                                fbm.id = t.getId();
+                            }
+                            if (t instanceof Epic) {
+                                fbm.epics.put(t.getId(), (Epic) t);
+                            } else if (t instanceof Subtask) {
+                                fbm.subtasks.put(t.getId(), (Subtask) t);
+                            } else {
+                                fbm.tasks.put(t.getId(), t);
+                            }
+                        }
+                    }
+                    counter++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                Files.createFile(file.toPath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return fbm;
+    }
+
     @Override
     public int addEpic(Epic epic) {
         int id = super.addEpic(epic);
@@ -133,42 +170,5 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка сохранения в файл");
         }
-    }
-
-    static FileBackedTaskManager loadFromFile(File file) {
-        FileBackedTaskManager fbm = new FileBackedTaskManager(file);
-        if (file.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                String line;
-                int counter = 0;
-                while ((line = reader.readLine()) != null) {
-                    if (counter != 0) {
-                        Task t = fromString(line);
-                        if (t != null) {
-                            if (fbm.id < t.getId()) {
-                                fbm.id = t.getId();
-                            }
-                            if (t instanceof Epic) {
-                                fbm.epics.put(t.getId(), (Epic) t);
-                            } else if (t instanceof Subtask) {
-                                fbm.subtasks.put(t.getId(), (Subtask) t);
-                            } else {
-                                fbm.tasks.put(t.getId(), t);
-                            }
-                        }
-                    }
-                    counter++;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                Files.createFile(file.toPath());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return fbm;
     }
 }
