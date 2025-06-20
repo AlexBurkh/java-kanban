@@ -1,3 +1,5 @@
+import java.util.stream.Collectors;
+
 import static java.util.Objects.hash;
 
 public class Task {
@@ -20,14 +22,26 @@ public class Task {
         this.status = status;
     }
 
+    public static Task importTask(int id, String name, String description, TaskStatus status) {
+        Task task = new Task(name, description, status);
+        task.setId(id);
+        return task;
+    }
+
     @Override
     public String toString() {
-        return "Task{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        TaskType type = this instanceof Epic ?
+                TaskType.EPIC : this instanceof Subtask ?
+                TaskType.SUBTASK : TaskType.TASK;
+        String links = null;
+        if (this instanceof Epic epic) {
+            links = epic.getSubTasks().stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(" "));
+        } else if (this instanceof Subtask subtask) {
+            links = String.valueOf(subtask.getEpicId());
+        }
+        return id + "," + type + "," + name + "," + status + ","  + description + "," + links;
     }
 
     @Override
