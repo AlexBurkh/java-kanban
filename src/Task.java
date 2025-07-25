@@ -59,12 +59,6 @@ public class Task {
         return task;
     }
 
-    public static Task importTask(int id, String name, String description, TaskStatus status) {
-        Task task = new Task(name, description, status);
-        task.setId(id);
-        return task;
-    }
-
     @Override
     public String toString() {
         TaskType type = this instanceof Epic ?
