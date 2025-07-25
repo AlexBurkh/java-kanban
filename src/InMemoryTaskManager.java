@@ -195,6 +195,8 @@ public class InMemoryTaskManager implements TaskManager {
                     .map(Subtask::getEndTime)
                     .max(LocalDateTime::compareTo)
                     .orElse(null);
+            epic.setStartTime(start);
+            epic.setEndTime(end);
             if ((start != null) && (end != null)) {
                 epic.setDuration(Duration.between(start, end));
             }

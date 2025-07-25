@@ -26,7 +26,9 @@ public class Epic extends Task {
         Epic e = new Epic(task.name, task.description);
         e.setId(task.getId());
         e.setStatus(task.getStatus());
-        e.setEndTime(e.getStartTime().plus(e.getDuration()));
+        e.setStartTime(task.getStartTime());
+        e.setEndTime(task.getEndTime());
+        e.setDuration(task.getDuration());
         for (var subtask : subtasks) {
             e.addSubTask(subtask);
         }

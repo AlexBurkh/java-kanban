@@ -72,8 +72,9 @@ public class Task {
         } else if (this instanceof Subtask subtask) {
             links = String.valueOf(subtask.getEpicId());
         }
-        return id + "," + type + "," + name + "," + status + "," + description + "," + startTime
-                + "," + duration.toMinutes() + "," + links;
+        return id + "," + type + "," + name + "," + status + "," + description + ","
+                + (startTime == null ? "null" : startTime)
+                + "," + (duration == null ? "null" : duration.toMinutes()) + "," + links;
     }
 
     @Override

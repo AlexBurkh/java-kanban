@@ -135,13 +135,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         var status = TaskStatus.valueOf(items[3]);
         var description = items[4];
         var startTimeString = items[5];
-        LocalDateTime startTime = LocalDateTime.parse(startTimeString);
-        var durationMinutes = Integer.parseInt(items[6]);
-        Duration duration = Duration.ofMinutes(durationMinutes);
+        var durationMinutesString = items[6];
+        LocalDateTime startTime;
+        Duration duration;
+        if (! startTimeString.equals("null")) {
+            startTime = LocalDateTime.parse(startTimeString);
+        } else {
+            startTime = null;
+        }
+        if (! durationMinutesString.equals("null")) {
+            duration = Duration.ofMinutes(Integer.parseInt(durationMinutesString));
+        } else {
+            duration = null;
+        }
         Task t = Task.importTask(id, name, description, status, startTime, duration);
         switch (type) {
             case EPIC : {
-                String[] subtasks = items[5].split(" ");
+                String[] subtasks = items[7].split(" ");
                 List<Integer> subtaskIds = new ArrayList<>(subtasks.length);
                 for (String subtask : subtasks) {
                     subtaskIds.add(Integer.parseInt(subtask));
@@ -149,7 +159,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 return Epic.importEpicFromTask(t, subtaskIds);
             }
             case SUBTASK : {
-                int epicId = Integer.parseInt(items[5]);
+                int epicId = Integer.parseInt(items[7]);
                 return Subtask.importSubtask(t, epicId);
             }
             case TASK : {
