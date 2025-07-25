@@ -3,6 +3,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -132,7 +134,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         var name = items[2];
         var status = TaskStatus.valueOf(items[3]);
         var description = items[4];
-        Task t = Task.importTask(id, name, description, status);
+        var startTimeString = items[5];
+        LocalDateTime startTime = LocalDateTime.parse(startTimeString);
+        var durationMinutes = Integer.parseInt(items[6]);
+        Duration duration = Duration.ofMinutes(durationMinutes);
+        Task t = Task.importTask(id, name, description, status, startTime, duration);
         switch (type) {
             case EPIC : {
                 String[] subtasks = items[5].split(" ");
@@ -155,7 +161,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         StringBuilder sb = new StringBuilder();
-        sb.append("id,type,name,status,description,links").append("\n");
+        sb.append("id,type,name,status,description,startTime,duration,links").append("\n");
         for (var task : tasks.values()) {
             sb.append(task).append("\n");
         }

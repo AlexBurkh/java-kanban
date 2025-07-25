@@ -1,3 +1,7 @@
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.hash;
@@ -7,6 +11,26 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus status;
+    protected LocalDateTime startTime;
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    protected Duration duration;
+
 
     public String getName() {
         return name;
@@ -16,10 +40,23 @@ public class Task {
         return description;
     }
 
-    public Task(String name, String description, TaskStatus status) {
+    public Task(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration) {
         this.name = name;
         this.description = description;
         this.status = status;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
+    public static Task importTask(int id, String name, String description, TaskStatus status,
+                                  LocalDateTime startTime, Duration duration) {
+        Task task = new Task(name, description, status, startTime, duration);
+        task.setId(id);
+        return task;
     }
 
     public static Task importTask(int id, String name, String description, TaskStatus status) {
@@ -41,7 +78,8 @@ public class Task {
         } else if (this instanceof Subtask subtask) {
             links = String.valueOf(subtask.getEpicId());
         }
-        return id + "," + type + "," + name + "," + status + ","  + description + "," + links;
+        return id + "," + type + "," + name + "," + status + "," + description + "," + startTime
+                + "," + duration.toMinutes() + "," + links;
     }
 
     @Override
@@ -54,7 +92,7 @@ public class Task {
 
     @Override
     public int hashCode() {
-       return hash(id);
+        return hash(id);
     }
 
     public int getId() {
