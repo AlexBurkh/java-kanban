@@ -1,6 +1,9 @@
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeSet;
 
 public class InMemoryTaskManager implements TaskManager {
     protected int id = 0;
@@ -8,12 +11,14 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Integer, Epic> epics;
     protected final HashMap<Integer, Subtask> subtasks;
     private final HistoryManager historyManager;
+    TreeSet<Task> prioritizedTasks;
 
     public InMemoryTaskManager() {
         historyManager = Managers.getDefaultHistory();
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subtasks = new HashMap<>();
+        prioritizedTasks = new TreeSet<>((t1, t2) -> t1.getStartTime().compareTo(t2.getStartTime()));
     }
 
     @Override
@@ -58,6 +63,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (Epic epic : epics.values()) {
             epic.clearSubtasks();
             updateEpicStatus(epic.getId());
+            updateEpicTimeMetrics(epic.getId());
         }
     }
 
@@ -115,6 +121,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (relatedEpic != null) {
             relatedEpic.addSubTask(newId);
             updateEpicStatus(relatedEpicId);
+            updateEpicTimeMetrics(relatedEpicId);
         }
         return newId;
     }
@@ -134,6 +141,7 @@ public class InMemoryTaskManager implements TaskManager {
         var relatedEpicId = subtask.getEpicId();
         subtasks.put(subtask.getId(), subtask);
         updateEpicStatus(relatedEpicId);
+        updateEpicTimeMetrics(relatedEpicId);
     }
 
     @Override
@@ -162,6 +170,7 @@ public class InMemoryTaskManager implements TaskManager {
             subtasks.remove(id);
             relatedEpic.removeSubtaskById(id);
             updateEpicStatus(relatedEpicId);
+            updateEpicTimeMetrics(relatedEpicId);
         }
     }
 
@@ -172,6 +181,28 @@ public class InMemoryTaskManager implements TaskManager {
             return epic.getSubTasks();
         } else {
             return new ArrayList<>();
+        }
+    }
+
+    private void updateEpicTimeMetrics(int epicId) {
+        var epic = epics.get(epicId);
+        if (epic != null) {
+            var epicSubtasksIds = getEpicSubtasks(epicId);
+            LocalDateTime start = epicSubtasksIds.stream()
+                    .map(subtasks::get)
+                    .map(Subtask::getStartTime)
+                    .min(LocalDateTime::compareTo)
+                    .orElse(null);
+            LocalDateTime end = epicSubtasksIds.stream()
+                    .map(subtasks::get)
+                    .map(Subtask::getEndTime)
+                    .max(LocalDateTime::compareTo)
+                    .orElse(null);
+            epic.setStartTime(start);
+            epic.setEndTime(end);
+            if ((start != null) && (end != null)) {
+                epic.setDuration(Duration.between(start, end));
+            }
         }
     }
 

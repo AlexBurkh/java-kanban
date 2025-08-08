@@ -3,6 +3,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -132,10 +134,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         var name = items[2];
         var status = TaskStatus.valueOf(items[3]);
         var description = items[4];
-        Task t = Task.importTask(id, name, description, status);
+        var startTimeString = items[5];
+        var durationMinutesString = items[6];
+        LocalDateTime startTime;
+        Duration duration;
+        if (! startTimeString.equals("null")) {
+            startTime = LocalDateTime.parse(startTimeString);
+        } else {
+            startTime = null;
+        }
+        if (! durationMinutesString.equals("null")) {
+            duration = Duration.ofMinutes(Integer.parseInt(durationMinutesString));
+        } else {
+            duration = null;
+        }
+        Task t = Task.importTask(id, name, description, status, startTime, duration);
         switch (type) {
             case EPIC : {
-                String[] subtasks = items[5].split(" ");
+                String[] subtasks = items[7].split(" ");
                 List<Integer> subtaskIds = new ArrayList<>(subtasks.length);
                 for (String subtask : subtasks) {
                     subtaskIds.add(Integer.parseInt(subtask));
@@ -143,7 +159,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 return Epic.importEpicFromTask(t, subtaskIds);
             }
             case SUBTASK : {
-                int epicId = Integer.parseInt(items[5]);
+                int epicId = Integer.parseInt(items[7]);
                 return Subtask.importSubtask(t, epicId);
             }
             case TASK : {
@@ -155,7 +171,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         StringBuilder sb = new StringBuilder();
-        sb.append("id,type,name,status,description,links").append("\n");
+        sb.append("id,type,name,status,description,startTime,duration,links").append("\n");
         for (var task : tasks.values()) {
             sb.append(task).append("\n");
         }
