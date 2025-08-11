@@ -11,6 +11,11 @@ public class HistoryHandler extends BaseHttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-
+        var history = tm.getHistory();
+        if (!history.isEmpty()) {
+            sendText(exchange, 200, gson.toJson(history));
+        } else {
+            sendNotFound(exchange);
+        }
     }
 }

@@ -11,6 +11,11 @@ public class PrioritizedHandler extends BaseHttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-
+        var prioritized = tm.getPrioritizedTasks();
+        if (!prioritized.isEmpty()) {
+            sendText(exchange, 200, gson.toJson(tm.getPrioritizedTasks()));
+        } else {
+            sendNotFound(exchange);
+        }
     }
 }

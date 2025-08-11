@@ -1,9 +1,6 @@
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     protected int id = 0;
@@ -11,7 +8,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Integer, Epic> epics;
     protected final HashMap<Integer, Subtask> subtasks;
     private final HistoryManager historyManager;
-    TreeSet<Task> prioritizedTasks;
+    private final TreeSet<Task> prioritizedTasks;
 
     public InMemoryTaskManager() {
         historyManager = Managers.getDefaultHistory();
@@ -74,7 +71,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(task);
             return task;
         } else {
-            throw new NullPointerException("Task с заданным id не найден");
+            throw new NotFoundException("Task с заданным id не найден");
         }
     }
 
@@ -83,8 +80,10 @@ public class InMemoryTaskManager implements TaskManager {
         var epic = epics.get(id);
         if (epic != null) {
             historyManager.add(epic);
+            return epic;
+        } else {
+            throw new NotFoundException("Task с заданным id не найден");
         }
-        return epic;
     }
 
     @Override
@@ -92,8 +91,10 @@ public class InMemoryTaskManager implements TaskManager {
         var subtask = subtasks.get(id);
         if (subtask != null) {
             historyManager.add(subtask);
+            return subtask;
+        } else {
+            throw new NotFoundException("Task с заданным id не найден");
         }
-        return subtask;
     }
 
     @Override
@@ -184,6 +185,19 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        List<Task> prioritized = new ArrayList<>(tasks.values());
+        prioritized.addAll(subtasks.values());
+        prioritized.sort(new Comparator<Task>() {
+            @Override
+            public int compare(Task t1, Task t2) {
+                return t1.getStartTime().compareTo(t2.getStartTime());
+            }
+        });
+        return prioritized;
     }
 
     private void updateEpicTimeMetrics(int epicId) {
