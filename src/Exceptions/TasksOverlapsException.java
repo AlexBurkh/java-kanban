@@ -1,3 +1,5 @@
+package Exceptions;
+
 public class TasksOverlapsException extends RuntimeException {
     public TasksOverlapsException() {
 

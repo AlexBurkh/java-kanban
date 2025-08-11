@@ -1,3 +1,5 @@
+package Exceptions;
+
 public class EpicNotExistsException  extends RuntimeException {
     public EpicNotExistsException() {
 
