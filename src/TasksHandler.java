@@ -6,13 +6,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class TasksHandler extends BaseHttpHandler {
-    private TaskManager tm;
-
-
-    public TasksHandler(TaskManager tm) {
-        this.tm = tm;
+    protected TasksHandler(TaskManager tm) {
+        super(tm);
     }
-
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -30,16 +26,16 @@ public class TasksHandler extends BaseHttpHandler {
         if (pathParts.length == 2) {
             sendText(e, 200, gson.toJson(tm.getTasks()));
         } else if (pathParts.length == 3) {
-            String taskIdInStr = pathParts[2];
+            String taskIdStr = pathParts[2];
             try {
-                var taskId = Integer.parseInt(taskIdInStr);
+                var taskId = Integer.parseInt(taskIdStr);
                 var task = tm.getTaskById(taskId);
                 sendText(e, 200, gson.toJson(task));
             } catch (NumberFormatException | NotFoundException ex) {
                 sendNotFound(e);
             }
         } else {
-            sendNotFound(e);
+            sendIncorrectData(e);
         }
     }
 
@@ -47,8 +43,7 @@ public class TasksHandler extends BaseHttpHandler {
         if (pathParts.length == 2) {
             try (InputStream is = e.getRequestBody()) {
                 String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-                System.out.println(body);
-                Task task = gson.fromJson(body, Task.class);
+                var task = gson.fromJson(body, Task.class);
                 try {
                     if (body.contains("id")) {
                         tm.updateTask(task);
@@ -63,22 +58,22 @@ public class TasksHandler extends BaseHttpHandler {
                 }
             }
         } else {
-            sendNotFound(e);
+            sendIncorrectData(e);
         }
     }
 
     private void handleDelete(HttpExchange e, String[] pathParts) throws IOException {
         if (pathParts.length == 3) {
-            String taskIdInStr = pathParts[2];
+            String taskIdStr = pathParts[2];
             try {
-                var taskId = Integer.parseInt(taskIdInStr);
+                var taskId = Integer.parseInt(taskIdStr);
                 tm.removeTaskById(taskId);
                 sendText(e, 200, "");
             } catch (NumberFormatException | NotFoundException ex) {
                 sendNotFound(e);
             }
         } else {
-            sendNotFound(e);
+            sendIncorrectData(e);
         }
     }
 }

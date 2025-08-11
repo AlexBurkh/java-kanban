@@ -15,11 +15,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public abstract class BaseHttpHandler implements HttpHandler {
+    protected TaskManager tm;
     protected Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
             .registerTypeAdapter(Duration.class, new DurationTypeAdapter())
             .create();
+
+    protected BaseHttpHandler(TaskManager tm) {
+        this.tm = tm;
+    }
 
     class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -55,6 +60,13 @@ public abstract class BaseHttpHandler implements HttpHandler {
         e.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
         e.sendResponseHeaders(returnCode, resp.length);
         e.getResponseBody().write(resp);
+        e.close();
+    }
+
+    protected void sendIncorrectData(HttpExchange e) throws IOException {
+        String text = "Incorrect data";
+        e.sendResponseHeaders(400, 0);
+        e.getResponseBody().write(text.getBytes(StandardCharsets.UTF_8));
         e.close();
     }
 
