@@ -11,9 +11,9 @@ public class HistoryHandler extends BaseHttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         var history = tm.getHistory();
         if (!history.isEmpty()) {
-            sendText(exchange, 200, gson.toJson(history));
+            send(exchange, OK, gson.toJson(history));
         } else {
-            sendNotFound(exchange);
+            sendNotFound(exchange, "History is empty");
         }
     }
 }

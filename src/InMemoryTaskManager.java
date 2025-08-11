@@ -116,17 +116,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addSubTask(Subtask subtask) {
-        int newId = generateId(); // Сделал для удобства использования возврат этого id из метода
-        subtask.setId(newId);
-        subtasks.put(subtask.getId(), subtask);
         int relatedEpicId = subtask.getEpicId();
         Epic relatedEpic = epics.get(relatedEpicId);
         if (relatedEpic != null) {
+            int newId = generateId(); // Сделал для удобства использования возврат этого id из метода
+            subtask.setId(newId);
+            subtasks.put(subtask.getId(), subtask);
             relatedEpic.addSubTask(newId);
             updateEpicStatus(relatedEpicId);
             updateEpicTimeMetrics(relatedEpicId);
+            return newId;
+        } else {
+            throw new EpicNotExistsException("Epic с таким id не существует");
         }
-        return newId;
     }
 
     @Override
@@ -142,9 +144,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubTask(Subtask subtask) {
         var relatedEpicId = subtask.getEpicId();
-        subtasks.put(subtask.getId(), subtask);
-        updateEpicStatus(relatedEpicId);
-        updateEpicTimeMetrics(relatedEpicId);
+        Epic relatedEpic = epics.get(relatedEpicId);
+        if (relatedEpic != null) {
+            subtasks.put(subtask.getId(), subtask);
+            updateEpicStatus(relatedEpicId);
+            updateEpicTimeMetrics(relatedEpicId);
+        } else {
+            throw new EpicNotExistsException("Epic с таким id не существует");
+        }
     }
 
     @Override

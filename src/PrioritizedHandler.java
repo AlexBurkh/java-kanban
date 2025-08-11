@@ -11,9 +11,9 @@ public class PrioritizedHandler extends BaseHttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         var prioritized = tm.getPrioritizedTasks();
         if (!prioritized.isEmpty()) {
-            sendText(exchange, 200, gson.toJson(tm.getPrioritizedTasks()));
+            send(exchange, OK, gson.toJson(tm.getPrioritizedTasks()));
         } else {
-            sendNotFound(exchange);
+            sendNotFound(exchange, "Задач нет, невозможно вывести в приоритете");
         }
     }
 }
