@@ -72,8 +72,10 @@ public class InMemoryTaskManager implements TaskManager {
         var task = tasks.get(id);
         if (task != null) {
             historyManager.add(task);
+            return task;
+        } else {
+            throw new NullPointerException("Task с заданным id не найден");
         }
-        return task;
     }
 
     @Override

@@ -10,6 +10,17 @@ public class Task {
     protected int id;
     protected TaskStatus status;
     protected LocalDateTime startTime;
+    protected Duration duration;
+
+
+    public Task(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
 
     public Duration getDuration() {
         return duration;
@@ -27,23 +38,12 @@ public class Task {
         this.startTime = startTime;
     }
 
-    protected Duration duration;
-
-
     public String getName() {
         return name;
     }
 
     public String getDescription() {
         return description;
-    }
-
-    public Task(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration) {
-        this.name = name;
-        this.description = description;
-        this.status = status;
-        this.startTime = startTime;
-        this.duration = duration;
     }
 
     public LocalDateTime getEndTime() {
