@@ -109,7 +109,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
         if (pathParts.length == 2) {
             try (InputStream is = e.getRequestBody()) {
                 String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-                var object = gson.fromJson(body, entity);
+                Task object = gson.fromJson(body, entity);
                 try {
                     if (body.contains("id")) {
                         if (entity.equals(Task.class)) {
