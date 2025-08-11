@@ -21,28 +21,6 @@ public abstract class BaseHttpHandler implements HttpHandler {
             .registerTypeAdapter(Duration.class, new DurationTypeAdapter())
             .create();
 
-    protected void sendText(HttpExchange e, String text) throws IOException {
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        e.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        e.sendResponseHeaders(200, resp.length);
-        e.getResponseBody().write(resp);
-        e.close();
-    }
-
-    protected void sendNotFound(HttpExchange e) throws IOException {
-        e.sendResponseHeaders(404, 0);
-    }
-
-    protected void sendHasOverlaps(HttpExchange e) throws IOException {
-        e.sendResponseHeaders(406, 0);
-    }
-
-    protected void sendInternalError(HttpExchange e) throws IOException {
-        e.sendResponseHeaders(500, 0);
-    }
-
-    class TasklistTypeToken extends TypeToken<List<Task>> {}
-
     class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
@@ -66,11 +44,38 @@ public abstract class BaseHttpHandler implements HttpHandler {
         @Override
         public Duration read(JsonReader jsonReader) throws IOException {
             String durationString = jsonReader.nextString();
-            return Duration.parse(durationString);
+            return Duration.ofMinutes(Long.parseLong(durationString));
         }
     }
 
-    public void test(String a) {
-        Task t = gson.fromJson(a, Task.class);
+    class TasklistTypeToken extends TypeToken<List<Task>> {}
+
+    protected void sendText(HttpExchange e, int returnCode, String text) throws IOException {
+        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+        e.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        e.sendResponseHeaders(returnCode, resp.length);
+        e.getResponseBody().write(resp);
+        e.close();
+    }
+
+    protected void sendNotFound(HttpExchange e) throws IOException {
+        String text = "Not Found";
+        e.sendResponseHeaders(404, 0);
+        e.getResponseBody().write(text.getBytes(StandardCharsets.UTF_8));
+        e.close();
+    }
+
+    protected void sendHasOverlaps(HttpExchange e) throws IOException {
+        String text = "Has Overlaps";
+        e.sendResponseHeaders(406, 0);
+        e.getResponseBody().write(text.getBytes(StandardCharsets.UTF_8));
+        e.close();
+    }
+
+    protected void sendInternalError(HttpExchange e) throws IOException {
+        String text = "Internal Error";
+        e.sendResponseHeaders(500, 0);
+        e.getResponseBody().write(text.getBytes(StandardCharsets.UTF_8));
+        e.close();
     }
 }

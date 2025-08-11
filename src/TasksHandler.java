@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 public class TasksHandler extends BaseHttpHandler {
     private TaskManager tm;
 
+
     public TasksHandler(TaskManager tm) {
         this.tm = tm;
     }
@@ -20,19 +21,21 @@ public class TasksHandler extends BaseHttpHandler {
             handleGet(exchange, pathParts);
         } else if (exchange.getRequestMethod().equals("POST")) {
             handlePost(exchange, pathParts);
+        } else if (exchange.getRequestMethod().equals("DELETE")) {
+            handleDelete(exchange, pathParts);
         }
     }
 
     private void handleGet(HttpExchange e, String[] pathParts) throws IOException {
         if (pathParts.length == 2) {
-            sendText(e, gson.toJson(tm.getTasks()));
+            sendText(e, 200, gson.toJson(tm.getTasks()));
         } else if (pathParts.length == 3) {
             String taskIdInStr = pathParts[2];
             try {
                 var taskId = Integer.parseInt(taskIdInStr);
                 var task = tm.getTaskById(taskId);
-                sendText(e, gson.toJson(task));
-            } catch (NumberFormatException | NullPointerException ex) {
+                sendText(e, 200, gson.toJson(task));
+            } catch (NumberFormatException | NotFoundException ex) {
                 sendNotFound(e);
             }
         } else {
@@ -40,7 +43,6 @@ public class TasksHandler extends BaseHttpHandler {
         }
     }
 
-    // /task?name=name&description=description&status=NEW&startTime=2025-08-11T13:26:14.333&duration=14
     private void handlePost(HttpExchange e, String[] pathParts) throws IOException {
         if (pathParts.length == 2) {
             try (InputStream is = e.getRequestBody()) {
@@ -48,15 +50,32 @@ public class TasksHandler extends BaseHttpHandler {
                 System.out.println(body);
                 Task task = gson.fromJson(body, Task.class);
                 try {
-                    // Task task = gson.fromJson(body, Task.class);
-                    if (body.contains("id=")) {
+                    if (body.contains("id")) {
                         tm.updateTask(task);
+                        sendText(e, 200, "Задача с id: " + task.getId() + " обновлена");
                     } else {
                         tm.addTask(task);
+                        sendText(e, 201, "Задача с id: " + task.getId() + " успешно добавлена");
                     }
+
                 } catch (JsonSyntaxException ex) {
                     sendNotFound(e);
                 }
+            }
+        } else {
+            sendNotFound(e);
+        }
+    }
+
+    private void handleDelete(HttpExchange e, String[] pathParts) throws IOException {
+        if (pathParts.length == 3) {
+            String taskIdInStr = pathParts[2];
+            try {
+                var taskId = Integer.parseInt(taskIdInStr);
+                tm.removeTaskById(taskId);
+                sendText(e, 200, "");
+            } catch (NumberFormatException | NotFoundException ex) {
+                sendNotFound(e);
             }
         } else {
             sendNotFound(e);
