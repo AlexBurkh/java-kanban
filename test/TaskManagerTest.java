@@ -1,16 +1,16 @@
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class TaskManagerTest {
     private final TaskManager tm = Managers.getDefault();
 
-    @Before
+    @BeforeEach
     public void initTm() {
         tm.addTask(new Task("task1", "test task1", TaskStatus.NEW,
                 LocalDateTime.of(2025, 4, 14, 4, 13, 22, 0),

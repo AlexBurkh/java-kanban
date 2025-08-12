@@ -1,16 +1,17 @@
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class InMemoryHistoryManagerTest {
     private final static TaskManager tm = Managers.getDefault();
 
-    @Before
+    @BeforeEach
     public void initTM() {
         tm.addTask(new Task("task1", "test task1", TaskStatus.NEW,
                 LocalDateTime.of(2025, 4, 18, 4, 13, 22, 0),
