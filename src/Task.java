@@ -103,4 +103,20 @@ public class Task {
     public void setStatus(TaskStatus status) {
         this.status = status;
     }
+
+    public boolean overlapsWith(Task another) {
+        if (this.getStartTime() == null || another.getStartTime() == null) {
+            return false;
+        } else {
+            if (this.getDuration() == null || another.getDuration() == null) {
+                if (this.getStartTime() != null && another.getStartTime() != null) {
+                    return this.getStartTime().equals(another.getStartTime());
+                } else {
+                    return false;
+                }
+            }
+            return !(this.getEndTime().isBefore(another.getStartTime())
+                    || this.getStartTime().isAfter(another.getEndTime()));
+        }
+    }
 }

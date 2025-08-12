@@ -7,8 +7,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class EpicsHandler extends BaseHttpHandler {
-    protected EpicsHandler(TaskManager tm) {
-        super(tm);
+    protected EpicsHandler(TaskManager tm, boolean debug) {
+        super(tm, debug);
     }
 
     @Override

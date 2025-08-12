@@ -1,9 +1,14 @@
 import Exceptions.EpicNotExistsException;
 import Exceptions.NotFoundException;
+import Exceptions.TasksOverlapsException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected int id = 0;
@@ -102,64 +107,96 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addTask(Task task) {
-        int newId = generateId(); // Сделал для удобства использования возврат этого id из метода
-        task.setId(newId);
-        tasks.put(task.getId(), task);
-        prioritizedTasks.add(task);
-        return newId;
+        if (isOverlaps(task)) {
+            throw new TasksOverlapsException("Новая задача имеет пересечения во времени с существующими задачами");
+        } else {
+            int newId = generateId();
+            task.setId(newId);
+            tasks.put(task.getId(), task);
+            prioritizedTasks.add(task);
+            return newId;
+        }
     }
 
     @Override
     public int addEpic(Epic epic) {
-        int newId = generateId(); // Сделал для удобства использования возврат этого id из метода
-        epic.setId(newId);
-        epics.put(epic.getId(), epic);
-        updateEpicStatus(newId);
-        return newId;
+        if (isOverlaps(epic)) {
+            throw new TasksOverlapsException("Новая задача имеет пересечения во времени с существующими задачами");
+        } else {
+            int newId = generateId();
+            epic.setId(newId);
+            epics.put(epic.getId(), epic);
+            updateEpicStatus(newId);
+            return newId;
+        }
     }
 
     @Override
     public int addSubTask(Subtask subtask) {
-        int relatedEpicId = subtask.getEpicId();
-        Epic relatedEpic = epics.get(relatedEpicId);
-        if (relatedEpic != null) {
-            int newId = generateId(); // Сделал для удобства использования возврат этого id из метода
-            subtask.setId(newId);
-            subtasks.put(subtask.getId(), subtask);
-            prioritizedTasks.add(subtask);
-            relatedEpic.addSubTask(newId);
-            updateEpicStatus(relatedEpicId);
-            updateEpicTimeMetrics(relatedEpicId);
-            return newId;
+        if (isOverlaps(subtask)) {
+            throw new TasksOverlapsException("Новая задача имеет пересечения во времени с существующими задачами");
         } else {
-            throw new EpicNotExistsException("Epic с таким id не существует");
+            int relatedEpicId = subtask.getEpicId();
+            Epic relatedEpic = epics.get(relatedEpicId);
+            if (relatedEpic != null) {
+                int newId = generateId(); // Сделал для удобства использования возврат этого id из метода
+                subtask.setId(newId);
+                subtasks.put(subtask.getId(), subtask);
+                prioritizedTasks.add(subtask);
+                relatedEpic.addSubTask(newId);
+                updateEpicStatus(relatedEpicId);
+                updateEpicTimeMetrics(relatedEpicId);
+                return newId;
+            } else {
+                throw new EpicNotExistsException("Epic с таким id не существует");
+            }
         }
     }
 
     @Override
     public void updateTask(Task task) {
-        tasks.put(task.getId(), task);
-        prioritizedTasks.remove(task);
-        prioritizedTasks.add(task);
+        if (isOverlaps(task)) {
+            throw new TasksOverlapsException("Новая задача имеет пересечения во времени с существующими задачами");
+        } else {
+            tasks.put(task.getId(), task);
+            prioritizedTasks.remove(task);
+            prioritizedTasks.add(task);
+        }
     }
 
     @Override
     public void updateEpic(Epic epic) {
-        epics.put(epic.getId(), epic);
+        if (isOverlaps(epic)) {
+            throw new TasksOverlapsException("Новая задача имеет пересечения во времени с существующими задачами");
+        } else {
+            var oldEpicSubtasks = epics.get(epic.getId()).getSubTasks();
+            var newEpicSubtasks = epic.getSubTasks();
+
+            oldEpicSubtasks.stream()
+                    .filter(id -> ! newEpicSubtasks.contains(id))
+                    .toList()
+                    .forEach(subtasks::remove);
+
+            epics.put(epic.getId(), epic);
+        }
     }
 
     @Override
     public void updateSubTask(Subtask subtask) {
-        var relatedEpicId = subtask.getEpicId();
-        Epic relatedEpic = epics.get(relatedEpicId);
-        if (relatedEpic != null) {
-            subtasks.put(subtask.getId(), subtask);
-            prioritizedTasks.remove(subtask);
-            prioritizedTasks.add(subtask);
-            updateEpicStatus(relatedEpicId);
-            updateEpicTimeMetrics(relatedEpicId);
+        if (isOverlaps(subtask)) {
+            throw new TasksOverlapsException("Новая задача имеет пересечения во времени с существующими задачами");
         } else {
-            throw new EpicNotExistsException("Epic с таким id не существует");
+            var relatedEpicId = subtask.getEpicId();
+            Epic relatedEpic = epics.get(relatedEpicId);
+            if (relatedEpic != null) {
+                subtasks.put(subtask.getId(), subtask);
+                prioritizedTasks.remove(subtask);
+                prioritizedTasks.add(subtask);
+                updateEpicStatus(relatedEpicId);
+                updateEpicTimeMetrics(relatedEpicId);
+            } else {
+                throw new EpicNotExistsException("Epic с таким id не существует");
+            }
         }
     }
 
@@ -178,6 +215,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null) {
             var epicSubtasks = getEpicSubtasks(id);
             for (Integer epicSubtask : epicSubtasks) {
+                prioritizedTasks.remove(subtasks.get(epicSubtask));
                 removeSubtaskById(epicSubtask);
             }
             epics.remove(id);
@@ -276,5 +314,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     private int generateId() {
         return ++id;
+    }
+
+    private boolean isOverlaps(Task taskToCheck) {
+        var prioritized = getPrioritizedTasks();
+        return prioritized.stream()
+                .anyMatch(taskToCheck::overlapsWith);
     }
 }

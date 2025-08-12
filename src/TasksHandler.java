@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class TasksHandler extends BaseHttpHandler {
-    protected TasksHandler(TaskManager tm) {
-        super(tm);
+    protected TasksHandler(TaskManager tm, boolean debug) {
+        super(tm, debug);
     }
 
     @Override

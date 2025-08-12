@@ -1,5 +1,6 @@
 import Exceptions.EpicNotExistsException;
 import Exceptions.NotFoundException;
+import Exceptions.TasksOverlapsException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -28,10 +29,12 @@ public abstract class BaseHttpHandler implements HttpHandler {
 
     protected TaskManager tm;
     protected Gson gson;
+    protected boolean debug = false;
 
 
-    protected BaseHttpHandler(TaskManager tm) {
+    protected BaseHttpHandler(TaskManager tm, boolean debug) {
         this.tm = tm;
+        this.debug = debug;
         gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
@@ -96,12 +99,24 @@ public abstract class BaseHttpHandler implements HttpHandler {
                     send(e, OK, gson.toJson(epic));
                 }
             } catch (NotFoundException ex) {
-                sendNotFound(e, ex.getMessage());
+                if (debug) {
+                    sendNotFound(e, ex.getMessage());
+                } else
+                    sendNotFound(e, "");
+
             } catch (NumberFormatException ex) {
-                sendIncorrectData(e, ex.getMessage());
+                if (debug) {
+                    sendIncorrectData(e, ex.getMessage());
+                } else
+                    sendIncorrectData(e, "");
+
             }
         } else {
-            sendIncorrectURL(e);
+            if (debug) {
+                sendIncorrectURL(e);
+            } else
+                sendIncorrectData(e, "");
+
         }
     }
 
@@ -119,7 +134,10 @@ public abstract class BaseHttpHandler implements HttpHandler {
                         } else if (entity.equals(Epic.class)) {
                             tm.updateEpic((Epic) object);
                         }
-                        send(e, OK, "Задача с id: " + object.getId() + " обновлена");
+                        if (debug) {
+                            send(e, OK, "Задача с id: " + object.getId() + " обновлена");
+                        } else
+                            send(e, OK, "");
                     } else {
                         if (entity.equals(Task.class)) {
                             tm.addTask(object);
@@ -128,16 +146,37 @@ public abstract class BaseHttpHandler implements HttpHandler {
                         } else if (entity.equals(Epic.class)) {
                             tm.addEpic((Epic) object);
                         }
-                        send(e, ADDED, "Задача с id: " + object.getId() + " успешно добавлена");
+                        if (debug) {
+                            send(e, ADDED, "Задача с id: " + object.getId() + " успешно добавлена");
+                        } else
+                            send(e, ADDED, "");
                     }
                 } catch (JsonSyntaxException ex) {
-                    sendIncorrectJSON(e);
+                    if (debug) {
+                        sendIncorrectJSON(e);
+                    } else
+                        sendIncorrectData(e, "");
+
                 } catch (EpicNotExistsException ex) {
-                    sendNotFound(e, ex.getMessage());
+                    if (debug) {
+                        sendNotFound(e, ex.getMessage());
+                    } else
+                        sendNotFound(e, "");
+
                 }
+            } catch (TasksOverlapsException ex) {
+                if (debug) {
+                    sendHasOverlaps(e, ex.getMessage());
+                } else
+                    sendHasOverlaps(e, "");
             }
         } else {
-            sendIncorrectURL(e);
+            if (debug) {
+                sendIncorrectURL(e);
+            } else {
+                sendIncorrectData(e, "");
+            }
+
         }
     }
 
@@ -155,12 +194,24 @@ public abstract class BaseHttpHandler implements HttpHandler {
                 }
                 send(e, OK, "");
             } catch (NotFoundException ex) {
-                sendNotFound(e, ex.getMessage());
+                if (debug) {
+                    sendNotFound(e, ex.getMessage());
+                } else {
+                    sendNotFound(e, "");
+                }
             } catch (NumberFormatException ex) {
-                sendNotFound(e, "Задача с id: " + idStr + " не найдена");
+                if (debug) {
+                    sendNotFound(e, "Задача с id: " + idStr + " не найдена");
+                } else {
+                    sendNotFound(e, "");
+                }
             }
         } else {
-            sendIncorrectURL(e);
+            if (debug) {
+                sendIncorrectURL(e);
+            } else {
+                sendIncorrectData(e, "");
+            }
         }
     }
 }

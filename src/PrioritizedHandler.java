@@ -3,8 +3,8 @@ import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 
 public class PrioritizedHandler extends BaseHttpHandler {
-    public PrioritizedHandler(TaskManager tm) {
-        super(tm);
+    public PrioritizedHandler(TaskManager tm, boolean debug) {
+        super(tm, debug);
     }
 
     @Override
@@ -13,7 +13,11 @@ public class PrioritizedHandler extends BaseHttpHandler {
         if (!prioritized.isEmpty()) {
             send(exchange, OK, gson.toJson(tm.getPrioritizedTasks()));
         } else {
-            sendNotFound(exchange, "Задач нет, невозможно вывести в приоритете");
+            if (debug) {
+                sendNotFound(exchange, "Задач нет, невозможно вывести в приоритете");
+            } else {
+                sendNotFound(exchange, "");
+            }
         }
     }
 }

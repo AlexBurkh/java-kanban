@@ -3,8 +3,8 @@ import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 
 public class HistoryHandler extends BaseHttpHandler {
-    public HistoryHandler(TaskManager tm) {
-        super(tm);
+    public HistoryHandler(TaskManager tm, boolean debug) {
+        super(tm, debug);
     }
 
     @Override
@@ -13,7 +13,12 @@ public class HistoryHandler extends BaseHttpHandler {
         if (!history.isEmpty()) {
             send(exchange, OK, gson.toJson(history));
         } else {
-            sendNotFound(exchange, "History is empty");
+            if (debug) {
+                sendNotFound(exchange, "History is empty");
+            } else {
+                sendNotFound(exchange, "");
+            }
+
         }
     }
 }
