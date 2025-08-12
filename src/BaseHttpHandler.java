@@ -130,7 +130,6 @@ public abstract class BaseHttpHandler implements HttpHandler {
                         }
                         send(e, ADDED, "Задача с id: " + object.getId() + " успешно добавлена");
                     }
-
                 } catch (JsonSyntaxException ex) {
                     sendIncorrectJSON(e);
                 } catch (EpicNotExistsException ex) {

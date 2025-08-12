@@ -5,7 +5,6 @@ import java.util.List;
 
 public class Epic extends Task {
     private ArrayList<Integer> subtasksId;
-    private Duration duration;
     private LocalDateTime endTime;
 
     @Override
