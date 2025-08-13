@@ -1,13 +1,10 @@
-import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 public class TasksHandler extends BaseHttpHandler {
-    protected TasksHandler(TaskManager tm, boolean debug) {
-        super(tm, debug);
+    protected TasksHandler(TaskManager tm) {
+        super(tm);
     }
 
     @Override

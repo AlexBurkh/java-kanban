@@ -7,8 +7,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class EpicsHandler extends BaseHttpHandler {
-    protected EpicsHandler(TaskManager tm, boolean debug) {
-        super(tm, debug);
+    protected EpicsHandler(TaskManager tm) {
+        super(tm);
     }
 
     @Override
@@ -37,15 +37,15 @@ public class EpicsHandler extends BaseHttpHandler {
                         send(e, ADDED, "Задача с id: " + epic.getId() + " успешно добавлена");
                     }
                 } catch (JsonSyntaxException ex) {
-                    sendIncorrectJSON(e);
+                    sendIncorrectData(e);
                 } catch (EpicNotExistsException ex) {
-                    sendNotFound(e, ex.getMessage());
+                    sendNotFound(e);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         } else {
-            sendIncorrectURL(e);
+            sendNotFound(e);
         }
     }
 }

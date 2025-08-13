@@ -29,12 +29,10 @@ public abstract class BaseHttpHandler implements HttpHandler {
 
     protected TaskManager tm;
     protected Gson gson;
-    protected boolean debug = false;
 
 
-    protected BaseHttpHandler(TaskManager tm, boolean debug) {
+    protected BaseHttpHandler(TaskManager tm) {
         this.tm = tm;
-        this.debug = debug;
         gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
@@ -51,28 +49,28 @@ public abstract class BaseHttpHandler implements HttpHandler {
         e.close();
     }
 
-    protected void sendIncorrectData(HttpExchange e, String text) throws IOException {
-        send(e, CLIENT_ERROR, text);
+    protected void sendOK(HttpExchange e) throws IOException {
+        send(e, OK, "");
     }
 
-    protected void sendIncorrectURL(HttpExchange e) throws IOException {
-        sendIncorrectData(e,"Некорректный URL");
+    protected void sendAdded(HttpExchange e) throws IOException {
+        send(e, ADDED, "");
     }
 
-    protected void sendIncorrectJSON(HttpExchange e) throws IOException {
-        sendIncorrectData(e, "Некорректный JSON");
+    protected void sendIncorrectData(HttpExchange e) throws IOException {
+        send(e, CLIENT_ERROR, "");
     }
 
-    protected void sendNotFound(HttpExchange e, String text) throws IOException {
-        send(e, NOT_FOUNT, text);
+    protected void sendNotFound(HttpExchange e) throws IOException {
+        send(e, NOT_FOUNT, "");
     }
 
-    protected void sendHasOverlaps(HttpExchange e, String text) throws IOException {
-        send(e, OVERLAPS, text);
+    protected void sendHasOverlaps(HttpExchange e) throws IOException {
+        send(e, OVERLAPS, "");
     }
 
-    protected void sendInternalError(HttpExchange e, String text) throws IOException {
-        send(e, INTERNAL_ERROR, text);
+    protected void sendInternalError(HttpExchange e) throws IOException {
+        send(e, INTERNAL_ERROR, "");
     }
 
     protected void handleGet(HttpExchange e, String[] pathParts, Class<? extends Task> entity) throws IOException {
@@ -99,24 +97,12 @@ public abstract class BaseHttpHandler implements HttpHandler {
                     send(e, OK, gson.toJson(epic));
                 }
             } catch (NotFoundException ex) {
-                if (debug) {
-                    sendNotFound(e, ex.getMessage());
-                } else
-                    sendNotFound(e, "");
-
+                sendNotFound(e);
             } catch (NumberFormatException ex) {
-                if (debug) {
-                    sendIncorrectData(e, ex.getMessage());
-                } else
-                    sendIncorrectData(e, "");
-
+                sendIncorrectData(e);
             }
         } else {
-            if (debug) {
-                sendIncorrectURL(e);
-            } else
-                sendIncorrectData(e, "");
-
+            sendIncorrectData(e);
         }
     }
 
@@ -134,10 +120,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
                         } else if (entity.equals(Epic.class)) {
                             tm.updateEpic((Epic) object);
                         }
-                        if (debug) {
-                            send(e, OK, "Задача с id: " + object.getId() + " обновлена");
-                        } else
-                            send(e, OK, "");
+                        sendOK(e);
                     } else {
                         if (entity.equals(Task.class)) {
                             tm.addTask(object);
@@ -146,37 +129,20 @@ public abstract class BaseHttpHandler implements HttpHandler {
                         } else if (entity.equals(Epic.class)) {
                             tm.addEpic((Epic) object);
                         }
-                        if (debug) {
-                            send(e, ADDED, "Задача с id: " + object.getId() + " успешно добавлена");
-                        } else
-                            send(e, ADDED, "");
+                        sendAdded(e);
                     }
                 } catch (JsonSyntaxException ex) {
-                    if (debug) {
-                        sendIncorrectJSON(e);
-                    } else
-                        sendIncorrectData(e, "");
+                    sendIncorrectData(e);
 
                 } catch (EpicNotExistsException ex) {
-                    if (debug) {
-                        sendNotFound(e, ex.getMessage());
-                    } else
-                        sendNotFound(e, "");
+                    sendNotFound(e);
 
                 }
             } catch (TasksOverlapsException ex) {
-                if (debug) {
-                    sendHasOverlaps(e, ex.getMessage());
-                } else
-                    sendHasOverlaps(e, "");
+                sendHasOverlaps(e);
             }
         } else {
-            if (debug) {
-                sendIncorrectURL(e);
-            } else {
-                sendIncorrectData(e, "");
-            }
-
+            sendIncorrectData(e);
         }
     }
 
@@ -194,24 +160,12 @@ public abstract class BaseHttpHandler implements HttpHandler {
                 }
                 send(e, OK, "");
             } catch (NotFoundException ex) {
-                if (debug) {
-                    sendNotFound(e, ex.getMessage());
-                } else {
-                    sendNotFound(e, "");
-                }
+                sendNotFound(e);
             } catch (NumberFormatException ex) {
-                if (debug) {
-                    sendNotFound(e, "Задача с id: " + idStr + " не найдена");
-                } else {
-                    sendNotFound(e, "");
-                }
+                sendIncorrectData(e);
             }
         } else {
-            if (debug) {
-                sendIncorrectURL(e);
-            } else {
-                sendIncorrectData(e, "");
-            }
+            sendNotFound(e);
         }
     }
 }

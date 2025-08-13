@@ -3,8 +3,8 @@ import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 
 public class SubtasksHandler extends BaseHttpHandler {
-    protected SubtasksHandler(TaskManager tm, boolean debug) {
-        super(tm, debug);
+    protected SubtasksHandler(TaskManager tm) {
+        super(tm);
     }
 
     @Override

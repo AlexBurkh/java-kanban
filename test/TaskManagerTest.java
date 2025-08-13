@@ -64,7 +64,7 @@ public class TaskManagerTest {
     @Test
     public void shouldNoChangeTaskWhenAddingInTM() {
         var task = new Task("task555", "test task555", TaskStatus.NEW,
-                LocalDateTime.of(2025, 4, 14, 4, 13, 22, 0),
+                LocalDateTime.of(2025, 5, 14, 4, 13, 22, 0),
                 Duration.ofMinutes(40));
         var id = tm.addTask(task);
         var taskFromTM = tm.getTaskById(id);

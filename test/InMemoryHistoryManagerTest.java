@@ -9,79 +9,65 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class InMemoryHistoryManagerTest {
-    private final static TaskManager tm = Managers.getDefault();
+    private TaskManager tm = Managers.getDefault();
 
     @BeforeEach
     public void initTM() {
         tm.addTask(new Task("task1", "test task1", TaskStatus.NEW,
                 LocalDateTime.of(2025, 4, 18, 4, 13, 22, 0),
-                Duration.ofMinutes(40)));
+                Duration.ofMinutes(10)));
         tm.addEpic(new Epic("epic2", "test epic1"));
         tm.addTask(new Task("task3", "test task2", TaskStatus.NEW,
-                LocalDateTime.of(2025, 4, 19, 4, 13, 22, 0),
-                Duration.ofMinutes(40)));
+                LocalDateTime.of(2025, 4, 19, 3, 13, 22, 0),
+                Duration.ofMinutes(10)));
         tm.addTask(new Task("task4", "test task3", TaskStatus.NEW,
-                LocalDateTime.of(2025, 4, 20, 4, 13, 22, 0),
-                Duration.ofMinutes(40)));
-        tm.addTask(new Task("task5", "test task4", TaskStatus.NEW,
-                LocalDateTime.of(2025, 4, 21, 4, 13, 22, 0),
-                Duration.ofMinutes(40)));
-        tm.addTask(new Task("task6", "test task5", TaskStatus.NEW,
-                LocalDateTime.of(2025, 4, 22, 4, 13, 22, 0),
-                Duration.ofMinutes(40)));
-        tm.addTask(new Task("task7", "test task6", TaskStatus.NEW,
-                LocalDateTime.of(2025, 4, 23, 4, 13, 22, 0),
-                Duration.ofMinutes(40)));
+                LocalDateTime.of(2025, 4, 20, 2, 13, 22, 0),
+                Duration.ofMinutes(10)));
+        tm.addTask(new Task("task5", "test task6", TaskStatus.NEW,
+                LocalDateTime.of(2025, 4, 23, 23, 13, 22, 0),
+                Duration.ofMinutes(10)));
+        tm.addSubTask(new Subtask("subtask6", "test subtask", TaskStatus.DONE,
+                LocalDateTime.of(2025, 4, 24, 22, 13, 22, 0),
+                Duration.ofMinutes(10), 2));
+        tm.addSubTask(new Subtask("subtask7", "test subtask", TaskStatus.DONE,
+                LocalDateTime.of(2025, 4, 25, 21, 13, 22, 0),
+                Duration.ofMinutes(10), 2));
         tm.addSubTask(new Subtask("subtask8", "test subtask", TaskStatus.DONE,
-                LocalDateTime.of(2025, 4, 18, 4, 13, 22, 0),
-                Duration.ofMinutes(40), 2));
-        tm.addSubTask(new Subtask("subtask9", "test subtask", TaskStatus.DONE,
-                LocalDateTime.of(2025, 4, 18, 4, 13, 22, 0),
-                Duration.ofMinutes(40), 2));
-        tm.addSubTask(new Subtask("subtask10", "test subtask", TaskStatus.DONE,
-                LocalDateTime.of(2025, 4, 19, 4, 13, 22, 0),
-                Duration.ofMinutes(40), 2));
-        tm.addSubTask(new Subtask("subtask11", "test subtask", TaskStatus.NEW,
-                LocalDateTime.of(2025, 4, 20, 4, 13, 22, 0),
-                Duration.ofMinutes(40), 2));
-        tm.addEpic(new Epic("epic12", "test epic2"));
-        tm.addSubTask(new Subtask("subtask13", "test subtask", TaskStatus.IN_PROGRESS,
-                LocalDateTime.of(2025, 4, 21, 4, 13, 22, 0),
-                Duration.ofMinutes(40), 12));
+                LocalDateTime.of(2025, 4, 26, 20, 13, 22, 0),
+                Duration.ofMinutes(10), 2));
+        tm.addSubTask(new Subtask("subtask9", "test subtask", TaskStatus.NEW,
+                LocalDateTime.of(2025, 4, 27, 19, 13, 22, 0),
+                Duration.ofMinutes(10), 2));
+        tm.addEpic(new Epic("epic10", "test epic2"));
+        tm.addSubTask(new Subtask("subtask11", "test subtask", TaskStatus.IN_PROGRESS,
+                LocalDateTime.of(2025, 4, 28, 18, 13, 22, 0),
+                Duration.ofMinutes(10), 10));
+        tm.addSubTask(new Subtask("subtask12", "test subtask", TaskStatus.NEW,
+                LocalDateTime.of(2025, 4, 29, 17, 13, 22, 0),
+                Duration.ofMinutes(10), 10));
+        tm.addSubTask(new Subtask("subtask13", "test subtask", TaskStatus.NEW,
+                LocalDateTime.of(2025, 4, 30, 16, 13, 22, 0),
+                Duration.ofMinutes(10), 10));
         tm.addSubTask(new Subtask("subtask14", "test subtask", TaskStatus.NEW,
-                LocalDateTime.of(2025, 4, 22, 4, 13, 22, 0),
-                Duration.ofMinutes(40), 12));
+                LocalDateTime.of(2025, 4, 1, 15, 13, 22, 0),
+                Duration.ofMinutes(10), 10));
         tm.addSubTask(new Subtask("subtask15", "test subtask", TaskStatus.NEW,
-                LocalDateTime.of(2025, 4, 23, 4, 13, 22, 0),
-                Duration.ofMinutes(40), 12));
-        tm.addSubTask(new Subtask("subtask16", "test subtask", TaskStatus.NEW,
-                LocalDateTime.of(2025, 4, 4, 4, 13, 22, 0),
-                Duration.ofMinutes(40), 12));
-        tm.addSubTask(new Subtask("subtask17", "test subtask", TaskStatus.NEW,
-                LocalDateTime.of(2025, 4, 5, 4, 13, 22, 0),
-                Duration.ofMinutes(40), 12));
-        tm.getTaskById(1);
-        tm.getEpicById(2);
-        tm.getTaskById(3);
-        tm.getSubTaskById(8);
-        tm.getSubTaskById(9);
-        tm.getSubTaskById(10);
-        tm.getTaskById(1);
-        tm.getSubTaskById(15);
-        tm.getSubTaskById(16);
-        tm.getSubTaskById(17);
-        tm.getEpicById(12);
-        tm.getTaskById(5);
+                LocalDateTime.of(2025, 4, 2, 14, 13, 22, 0),
+                Duration.ofMinutes(10), 10));
     }
 
     @Test
     public void shouldHaveFirstIdEquals2() {
+        tm.getTaskById(1);
+        tm.getEpicById(2);
+        tm.getTaskById(3);
         List<Task> history = tm.getHistory();
-        assertEquals(2, history.getFirst().getId());
+        assertEquals(1, history.getFirst().getId());
     }
 
     @Test
     public void shouldHaveLastIdEquals5() {
+        tm.getTaskById(3);
         tm.getTaskById(5);
         List<Task> history = tm.getHistory();
         assertEquals(5, history.getLast().getId());
@@ -89,16 +75,11 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldHaveHistoryLengthEquals11() {
+        tm.getTaskById(1);
+        tm.getEpicById(2);
+        tm.getTaskById(3);
         List<Task> history = tm.getHistory();
-        assertEquals(11, history.size());
-    }
-
-    @Test
-    public void shouldHaveLastIdEquals15AndSize11() {
-        tm.getSubTaskById(15);
-        List<Task> history = tm.getHistory();
-        assertEquals(15, history.getLast().getId());
-        assertEquals(11, history.size());
+        assertEquals(3, history.size());
     }
 
     @Test

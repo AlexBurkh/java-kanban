@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TasksHandlerTest {
     String tasksUrl = "http://localhost:8080/tasks";
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
     Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
@@ -34,51 +35,72 @@ public class TasksHandlerTest {
 
     @BeforeEach
     public void start() {
-        hts.start(true);
-        String addTask0Body = "{\"name\":\"task0\",\"description\":\"description0\",\"status\":\"NEW\"," +
+        hts.start();
+        String addTask1Body = "{\"name\":\"task0\",\"description\":\"description0\",\"status\":\"NEW\"," +
                 "\"startTime\":\"2025-08-15T13:44:28.122\",\"duration\":20}";
-        String addTask1Body = "{\"name\":\"task1\",\"description\":\"description1\",\"status\":\"NEW\"," +
+        String addTask2Body = "{\"name\":\"task1\",\"description\":\"description1\",\"status\":\"NEW\"," +
                 "\"startTime\":\"2025-08-15T14:44:28.122\",\"duration\":20}";
         try {
-            sendPOST("http://localhost:8080/tasks", addTask0Body);
-            sendPOST("http://localhost:8080/tasks", addTask1Body);
+            sendPOST(tasksUrl, addTask1Body);
+            sendPOST(tasksUrl, addTask2Body);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     @Test
-    public void addTask() {
+    public void addTask() throws Exception {
         String addTask2Body = "{\"name\":\"task1\",\"description\":\"description1\",\"status\":\"NEW\"," +
                 "\"startTime\":\"2025-08-15T16:44:28.122\",\"duration\":20}";
-        try {
-            var response1 = sendPOST(tasksUrl, addTask2Body);
-            assertEquals("Задача с id: 3 успешно добавлена", response1.body());
-            assertEquals(201, response1.statusCode());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        var addTaskResponse = sendPOST(tasksUrl, addTask2Body);
+        var getTasksResponse = sendGET(tasksUrl + "/3");
+        var task = gson.fromJson(getTasksResponse.body(), Task.class);
+        assertEquals(201, addTaskResponse.statusCode());
+        assertEquals("2025-08-15T16:44:28.122", task.getStartTime().format(dtf));
+        assertEquals(TaskStatus.NEW, task.getStatus());
     }
 
     @Test
-    public void overlapsTest() {
-        String addTask1Body = "{\"name\":\"task1\",\"description\":\"description1\",\"status\":\"NEW\"," +
+    public void overlapsTest() throws Exception {
+        String overlaps1 = "{\"name\":\"task1\",\"description\":\"description1\",\"status\":\"NEW\"," +
                 "\"startTime\":\"2025-08-15T14:54:28.122\",\"duration\":20}";
-        String addTask2Body = "{\"name\":\"task1\",\"description\":\"description1\",\"status\":\"NEW\"," +
+        String overlaps2 = "{\"name\":\"task1\",\"description\":\"description1\",\"status\":\"NEW\"," +
                 "\"startTime\":\"2025-08-15T13:30:28.122\",\"duration\":20}";
-        try {
-            var response1 = sendPOST(tasksUrl, addTask1Body);
-            assertEquals(406, response1.statusCode());
-            assertEquals("Новая задача имеет пересечения во времени с существующими задачами", response1.body());
-            var response2 = sendPOST(tasksUrl, addTask2Body);
-            assertEquals(406, response2.statusCode());
-            assertEquals("Новая задача имеет пересечения во времени с существующими задачами", response2.body());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        String overlaps3 = "{\"id\":1,\"name\":\"task0\",\"description\":\"description0\",\"status\":\"NEW\"," +
+                "\"startTime\":\"2025-08-15T14:40:28.122\",\"duration\":20}";
+
+        var response1 = sendPOST(tasksUrl, overlaps1);
+        assertEquals(406, response1.statusCode());
+        var response2 = sendPOST(tasksUrl, overlaps2);
+        assertEquals(406, response2.statusCode());
+        var response3 = sendPOST(tasksUrl, overlaps3);
+        var overlaps3GetResponse = sendGET(tasksUrl + "/1");
+        var task = gson.fromJson(overlaps3GetResponse.body(), Task.class);
+        assertEquals(406, response3.statusCode());
+        assertEquals("2025-08-15T13:44:28.122", task.getStartTime().format(dtf));
     }
 
-    public HttpResponse<String> sendPOST(String url, String body)  throws IOException, InterruptedException {
+    @Test
+    public void updateTaskTest() throws Exception {
+        String updateBody = "{\"id\":1,\"name\":\"task1\",\"description\":\"edited\",\"status\":\"NEW\"," +
+                "\"startTime\":\"2025-08-15T16:44:28.122\",\"duration\":30}";
+        var updateResponse = sendPOST(tasksUrl, updateBody);
+        var getTaskResponse = sendGET(tasksUrl + "/1");
+        var task = gson.fromJson(getTaskResponse.body(), Task.class);
+        assertEquals(200, updateResponse.statusCode());
+        assertEquals("2025-08-15T16:44:28.122", task.getStartTime().format(dtf));
+        assertEquals(30, task.getDuration().toMinutes());
+    }
+
+    @Test
+    public void deleteTaskTest() throws Exception {
+        var deleteResponse = sendDelete(tasksUrl + "/1");
+        assertEquals(200, deleteResponse.statusCode());
+        var getDeletedTaskResponse = sendGET(tasksUrl + "/1");
+        assertEquals(404, getDeletedTaskResponse.statusCode());
+    }
+
+    public HttpResponse<String> sendPOST(String url, String body) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -86,10 +108,19 @@ public class TasksHandlerTest {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public HttpResponse<String> sendGET(String url)  throws IOException, InterruptedException {
+    public HttpResponse<String> sendGET(String url) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .GET().build();
+                .GET()
+                .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public HttpResponse<String> sendDelete(String url) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .DELETE()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected int id = 0;
@@ -156,7 +155,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (isOverlaps(task)) {
-            throw new TasksOverlapsException("Новая задача имеет пересечения во времени с существующими задачами");
+            throw new TasksOverlapsException("Задача имеет пересечения во времени с существующими задачами");
         } else {
             tasks.put(task.getId(), task);
             prioritizedTasks.remove(task);
@@ -167,16 +166,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateEpic(Epic epic) {
         if (isOverlaps(epic)) {
-            throw new TasksOverlapsException("Новая задача имеет пересечения во времени с существующими задачами");
+            throw new TasksOverlapsException("Задача имеет пересечения во времени с существующими задачами");
         } else {
             var oldEpicSubtasks = epics.get(epic.getId()).getSubTasks();
             var newEpicSubtasks = epic.getSubTasks();
-
             oldEpicSubtasks.stream()
                     .filter(id -> ! newEpicSubtasks.contains(id))
                     .toList()
                     .forEach(subtasks::remove);
-
             epics.put(epic.getId(), epic);
         }
     }
@@ -184,7 +181,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubTask(Subtask subtask) {
         if (isOverlaps(subtask)) {
-            throw new TasksOverlapsException("Новая задача имеет пересечения во времени с существующими задачами");
+            throw new TasksOverlapsException("Задача имеет пересечения во времени с существующими задачами");
         } else {
             var relatedEpicId = subtask.getEpicId();
             Epic relatedEpic = epics.get(relatedEpicId);
@@ -213,10 +210,10 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeEpicById(int id) {
         var epic = epics.get(id);
         if (epic != null) {
-            var epicSubtasks = getEpicSubtasks(id);
-            for (Integer epicSubtask : epicSubtasks) {
-                prioritizedTasks.remove(subtasks.get(epicSubtask));
-                removeSubtaskById(epicSubtask);
+            var epicSubtasksIds = getEpicSubtasks(id);
+            for (Integer epicSubtaskId : epicSubtasksIds) {
+                prioritizedTasks.remove(subtasks.get(epicSubtaskId));
+                subtasks.remove(epicSubtaskId);
             }
             epics.remove(id);
         }
