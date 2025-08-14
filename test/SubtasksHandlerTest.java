@@ -8,70 +8,51 @@ class SubtasksHandlerTest extends BaseHttpHandlerTest {
 
 
     @BeforeEach
-    public void start() {
+    public void start() throws Exception {
         hts.start();
-        String addTask1Body = "{\"name\":\"task0\",\"description\":\"description0\",\"status\":\"NEW\"," +
-                "\"startTime\":\"2025-08-15T13:44:28.122\",\"duration\":20}";
-        String addTask2Body = "{\"name\":\"task1\",\"description\":\"description1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"2025-08-15T14:44:28.122\",\"duration\":20}";
-        try {
-            sendPOST(subtasksUrl, addTask1Body);
-            sendPOST(subtasksUrl, addTask2Body);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        String epicBody = "{\"name\":\"epic\",\"description\":\"test epic\",\"status\":\"NEW\",\"subtasksId\":[ ]}";
+        var r1 = sendPOST(epicsUrl, epicBody);
     }
 
     @Test
     public void addTask() throws Exception {
-        String addTask2Body = "{\"name\":\"task1\",\"description\":\"description1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"2025-08-15T16:44:28.122\",\"duration\":20}";
-        var addTaskResponse = sendPOST(subtasksUrl, addTask2Body);
-        var getTasksResponse = sendGET(subtasksUrl + "/3");
-        var task = gson.fromJson(getTasksResponse.body(), Task.class);
+        String subtaskBody = "{\"epicId\":1,\"name\":\"subtask1\",\"description\":\"test subtask\",\"status\":\"NEW\"," +
+                "\"startTime\":\"2025-04-18T04:05:50.000\",\"duration\":40}";
+        var addTaskResponse = sendPOST(subtasksUrl, subtaskBody);
+        var getTasksResponse = sendGET(subtasksUrl + "/2");
+        var subtask = gson.fromJson(getTasksResponse.body(), Subtask.class);
         assertEquals(201, addTaskResponse.statusCode());
-        assertEquals("2025-08-15T16:44:28.122", task.getStartTime().format(dtf));
-        assertEquals(TaskStatus.NEW, task.getStatus());
+        assertEquals("2025-04-18T04:05:50.000", subtask.getStartTime().format(dtf));
+        assertEquals(TaskStatus.NEW, subtask.getStatus());
     }
 
     @Test
-    public void overlapsTest() throws Exception {
-        String overlaps1 = "{\"name\":\"task1\",\"description\":\"description1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"2025-08-15T14:54:28.122\",\"duration\":20}";
-        String overlaps2 = "{\"name\":\"task1\",\"description\":\"description1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"2025-08-15T13:30:28.122\",\"duration\":20}";
-        String overlaps3 = "{\"id\":1,\"name\":\"task0\",\"description\":\"description0\",\"status\":\"NEW\"," +
-                "\"startTime\":\"2025-08-15T14:40:28.122\",\"duration\":20}";
-
-        var response1 = sendPOST(subtasksUrl, overlaps1);
-        assertEquals(406, response1.statusCode());
-        var response2 = sendPOST(subtasksUrl, overlaps2);
-        assertEquals(406, response2.statusCode());
-        var response3 = sendPOST(subtasksUrl, overlaps3);
-        var overlaps3GetResponse = sendGET(subtasksUrl + "/1");
-        var task = gson.fromJson(overlaps3GetResponse.body(), Task.class);
-        assertEquals(406, response3.statusCode());
-        assertEquals("2025-08-15T13:44:28.122", task.getStartTime().format(dtf));
-    }
-
-    @Test
-    public void updateTaskTest() throws Exception {
-        String updateBody = "{\"id\":1,\"name\":\"task1\",\"description\":\"edited\",\"status\":\"NEW\"," +
-                "\"startTime\":\"2025-08-15T16:44:28.122\",\"duration\":30}";
-        var updateResponse = sendPOST(subtasksUrl, updateBody);
-        var getTaskResponse = sendGET(subtasksUrl + "/1");
-        var task = gson.fromJson(getTaskResponse.body(), Task.class);
+    public void updateSubtaskTest() throws Exception {
+        String subtaskBody = "{\"epicId\":1,\"name\":\"subtask1\",\"description\":\"test subtask\",\"status\":\"NEW\"," +
+                "\"startTime\":\"2025-04-18T04:05:50.000\",\"duration\":40}";
+        String changedSubtaskBody = "{\"epicId\":1,\"id\":2,\"name\":\"subtask1\",\"description\":\"test subtask\"," +
+                "\"status\":\"DONE\",\"startTime\":\"2025-04-18T05:05:50.000\",\"duration\":30}";
+        var addSubtaskResponse = sendPOST(subtasksUrl, subtaskBody);
+        var updateResponse = sendPOST(subtasksUrl, changedSubtaskBody);
+        var getTaskResponse = sendGET(subtasksUrl + "/2");
+        var task = gson.fromJson(getTaskResponse.body(), Subtask.class);
         assertEquals(200, updateResponse.statusCode());
-        assertEquals("2025-08-15T16:44:28.122", task.getStartTime().format(dtf));
+        assertEquals("2025-04-18T05:05:50.000", task.getStartTime().format(dtf));
         assertEquals(30, task.getDuration().toMinutes());
     }
 
     @Test
-    public void deleteTaskTest() throws Exception {
-        var deleteResponse = sendDelete(subtasksUrl + "/1");
+    public void deleteSubTaskTest() throws Exception {
+        String subtaskBody = "{\"epicId\":1,\"name\":\"subtask1\",\"description\":\"test subtask\",\"status\":\"NEW\"," +
+                "\"startTime\":\"2025-04-18T04:05:50.000\",\"duration\":40}";
+        var r1 = sendPOST(subtasksUrl, subtaskBody);
+        var deleteResponse = sendDelete(subtasksUrl + "/2");
         assertEquals(200, deleteResponse.statusCode());
         var getDeletedTaskResponse = sendGET(subtasksUrl + "/1");
         assertEquals(404, getDeletedTaskResponse.statusCode());
+        var epicResponse = sendGET(epicsUrl + "/1");
+        Epic epic = gson.fromJson(epicResponse.body(), Epic.class);
+        assertEquals(0, epic.getSubTasks().size());
     }
 
     @AfterEach
