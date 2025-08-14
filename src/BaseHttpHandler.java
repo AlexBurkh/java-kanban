@@ -171,48 +171,5 @@ public abstract class BaseHttpHandler implements HttpHandler {
 }
 
 
-class TasklistTypeToken extends TypeToken<List<Task>> {
 
-}
 
-class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-
-    @Override
-    public void write(JsonWriter jsonWriter, LocalDateTime ldt) throws IOException {
-        if (ldt == null) {
-            jsonWriter.nullValue();
-            return;
-        }
-        jsonWriter.value(ldt.format(dtf));
-    }
-
-    @Override
-    public LocalDateTime read(JsonReader jsonReader) throws IOException {
-        String dateString = jsonReader.nextString();
-        if (dateString == null || dateString.isEmpty()) {
-            return null;
-        }
-        return LocalDateTime.parse(dateString, dtf);
-    }
-}
-
-class DurationTypeAdapter extends TypeAdapter<Duration> {
-    @Override
-    public void write(JsonWriter jsonWriter, Duration duration) throws IOException {
-        if (duration == null) {
-            jsonWriter.nullValue();
-            return;
-        }
-        jsonWriter.value(duration.toMinutes());
-    }
-
-    @Override
-    public Duration read(JsonReader jsonReader) throws IOException {
-        String durationString = jsonReader.nextString();
-        if (durationString ==null || durationString.isEmpty()) {
-            return null;
-        }
-        return Duration.ofMinutes(Long.parseLong(durationString));
-    }
-}
