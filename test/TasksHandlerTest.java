@@ -62,6 +62,7 @@ public class TasksHandlerTest extends BaseHttpHandlerTest {
         var updateResponse = sendPOST(tasksUrl, updateBody);
         var getTaskResponse = sendGET(tasksUrl + "/1");
         var task = gson.fromJson(getTaskResponse.body(), Task.class);
+        assertEquals(200, getTaskResponse.statusCode());
         assertEquals(200, updateResponse.statusCode());
         assertEquals("2025-08-15T16:44:28.122", task.getStartTime().format(dtf));
         assertEquals(30, task.getDuration().toMinutes());

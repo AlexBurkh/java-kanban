@@ -316,6 +316,7 @@ public class InMemoryTaskManager implements TaskManager {
     private boolean isOverlaps(Task taskToCheck) {
         var prioritized = getPrioritizedTasks();
         return prioritized.stream()
+                .filter(task -> ! taskToCheck.equals(task))
                 .anyMatch(taskToCheck::overlapsWith);
     }
 }
