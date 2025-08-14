@@ -18,7 +18,7 @@ class BaseHttpHandlerTest {
             .registerTypeAdapter(Duration.class, new DurationTypeAdapter())
             .create();
     HttpTaskServer hts = new HttpTaskServer(Managers.getDefault());
-    HttpClient client = HttpClient.newHttpClient();
+    HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(30)).build();
 
     String tasksUrl = "http://localhost:8080/tasks";
     String subtasksUrl = "http://localhost:8080/subtasks";

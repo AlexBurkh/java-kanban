@@ -72,7 +72,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTaskById(int id) {
+    public Task getTaskById(int id) throws NotFoundException {
         var task = tasks.get(id);
         if (task != null) {
             historyManager.add(task);
@@ -83,7 +83,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic getEpicById(int id) {
+    public Epic getEpicById(int id) throws NotFoundException {
         var epic = epics.get(id);
         if (epic != null) {
             historyManager.add(epic);
@@ -94,7 +94,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask getSubTaskById(int id) {
+    public Subtask getSubTaskById(int id) throws NotFoundException {
         var subtask = subtasks.get(id);
         if (subtask != null) {
             historyManager.add(subtask);
@@ -131,7 +131,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public int addSubTask(Subtask subtask) {
+    public int addSubTask(Subtask subtask) throws EpicNotExistsException {
         if (isOverlaps(subtask)) {
             throw new TasksOverlapsException("Новая задача имеет пересечения во времени с существующими задачами");
         } else {
@@ -179,7 +179,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubTask(Subtask subtask) {
+    public void updateSubTask(Subtask subtask) throws EpicNotExistsException {
         if (isOverlaps(subtask)) {
             throw new TasksOverlapsException("Задача имеет пересечения во времени с существующими задачами");
         } else {

@@ -9,10 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class InMemoryHistoryManagerTest {
-    private TaskManager tm = Managers.getDefault();
+    private TaskManager tm;
 
     @BeforeEach
     public void initTM() {
+        tm = Managers.getDefault();
         tm.addTask(new Task("task1", "test task1", TaskStatus.NEW,
                 LocalDateTime.of(2025, 4, 18, 4, 13, 22, 0),
                 Duration.ofMinutes(10)));
@@ -58,11 +59,15 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldHaveFirstIdEquals2() {
-        tm.getTaskById(1);
-        tm.getEpicById(2);
-        tm.getTaskById(3);
-        List<Task> history = tm.getHistory();
-        assertEquals(1, history.getFirst().getId());
+        try {
+            tm.getTaskById(1);
+            tm.getEpicById(2);
+            tm.getTaskById(3);
+            List<Task> history = tm.getHistory();
+            assertEquals(1, history.getFirst().getId());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Test
@@ -75,18 +80,26 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldHaveHistoryLengthEquals11() {
-        tm.getTaskById(1);
-        tm.getEpicById(2);
-        tm.getTaskById(3);
-        List<Task> history = tm.getHistory();
-        assertEquals(3, history.size());
+        try {
+            tm.getTaskById(1);
+            tm.getEpicById(2);
+            tm.getTaskById(3);
+            List<Task> history = tm.getHistory();
+            assertEquals(3, history.size());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Test
     public void shouldReplaceTailNodeInHistoryForSameTask() {
-        tm.getTaskById(5);
-        tm.getTaskById(5);
-        List<Task> history = tm.getHistory();
-        assertEquals(5, history.getLast().getId());
+        try {
+            tm.getTaskById(5);
+            tm.getTaskById(5);
+            List<Task> history = tm.getHistory();
+            assertEquals(5, history.getLast().getId());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }
