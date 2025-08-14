@@ -2,6 +2,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SubtasksHandlerTest extends BaseHttpHandlerTest {
@@ -46,13 +48,24 @@ class SubtasksHandlerTest extends BaseHttpHandlerTest {
         String subtaskBody = "{\"epicId\":1,\"name\":\"subtask1\",\"description\":\"test subtask\",\"status\":\"NEW\"," +
                 "\"startTime\":\"2025-04-18T04:05:50.000\",\"duration\":40}";
         var r1 = sendPOST(subtasksUrl, subtaskBody);
-        var deleteResponse = sendDelete(subtasksUrl + "/2");
+        var deleteResponse = sendDELETE(subtasksUrl + "/2");
         assertEquals(200, deleteResponse.statusCode());
         var getDeletedTaskResponse = sendGET(subtasksUrl + "/1");
         assertEquals(404, getDeletedTaskResponse.statusCode());
         var epicResponse = sendGET(epicsUrl + "/1");
         Epic epic = gson.fromJson(epicResponse.body(), Epic.class);
         assertEquals(0, epic.getSubTasks().size());
+    }
+
+    @Test
+    public void subtaskDeletedIfEpicDeleted() throws Exception {
+        String subtaskBody = "{\"epicId\":1,\"name\":\"subtask1\",\"description\":\"test subtask\",\"status\":\"NEW\"," +
+                "\"startTime\":\"2025-04-18T04:05:50.000\",\"duration\":40}";
+        var r1 = sendPOST(subtasksUrl, subtaskBody);
+        var r2 = sendDELETE(epicsUrl + "/1");
+        var r3 = sendGET(subtasksUrl);
+        List<Subtask> subtasks = gson.fromJson(r3.body(), new TasklistTypeToken().getType());
+        assertEquals(0, subtasks.size());
     }
 
     @AfterEach

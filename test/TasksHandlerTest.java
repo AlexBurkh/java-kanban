@@ -70,7 +70,7 @@ public class TasksHandlerTest extends BaseHttpHandlerTest {
 
     @Test
     public void deleteTaskTest() throws Exception {
-        var deleteResponse = sendDelete(tasksUrl + "/1");
+        var deleteResponse = sendDELETE(tasksUrl + "/1");
         assertEquals(200, deleteResponse.statusCode());
         var getDeletedTaskResponse = sendGET(tasksUrl + "/1");
         assertEquals(404, getDeletedTaskResponse.statusCode());

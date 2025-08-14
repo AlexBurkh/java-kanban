@@ -41,7 +41,7 @@ class BaseHttpHandlerTest {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public HttpResponse<String> sendDelete(String url) throws IOException, InterruptedException {
+    public HttpResponse<String> sendDELETE(String url) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .DELETE()
