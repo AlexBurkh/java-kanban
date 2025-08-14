@@ -1,4 +1,4 @@
-import Exceptions.EpicNotExistsException;
+import exceptions.EpicNotExistsException;
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 
