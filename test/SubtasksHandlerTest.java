@@ -64,7 +64,7 @@ class SubtasksHandlerTest extends BaseHttpHandlerTest {
         var r1 = sendPOST(subtasksUrl, subtaskBody);
         var r2 = sendDELETE(epicsUrl + "/1");
         var r3 = sendGET(subtasksUrl);
-        List<Subtask> subtasks = gson.fromJson(r3.body(), new TasklistTypeToken().getType());
+        List<Subtask> subtasks = gson.fromJson(r3.body(), new TaskListTypeToken().getType());
         assertEquals(0, subtasks.size());
     }
 
