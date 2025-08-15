@@ -1,10 +1,10 @@
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class EpicTest {
-    @Test
+    @org.junit.jupiter.api.Test
     public void testEpicEquals() {
         var epic1 = new Epic("epic1", "test epic1");
         epic1.setId(1);

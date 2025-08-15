@@ -10,6 +10,17 @@ public class Task {
     protected int id;
     protected TaskStatus status;
     protected LocalDateTime startTime;
+    protected Duration duration;
+
+
+    public Task(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
 
     public Duration getDuration() {
         return duration;
@@ -27,23 +38,12 @@ public class Task {
         this.startTime = startTime;
     }
 
-    protected Duration duration;
-
-
     public String getName() {
         return name;
     }
 
     public String getDescription() {
         return description;
-    }
-
-    public Task(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration) {
-        this.name = name;
-        this.description = description;
-        this.status = status;
-        this.startTime = startTime;
-        this.duration = duration;
     }
 
     public LocalDateTime getEndTime() {
@@ -102,5 +102,21 @@ public class Task {
 
     public void setStatus(TaskStatus status) {
         this.status = status;
+    }
+
+    public boolean overlapsWith(Task another) {
+        if (this.getStartTime() == null || another.getStartTime() == null) {
+            return false;
+        } else {
+            if (this.getDuration() == null || another.getDuration() == null) {
+                if (this.getStartTime() != null && another.getStartTime() != null) {
+                    return this.getStartTime().equals(another.getStartTime());
+                } else {
+                    return false;
+                }
+            }
+            return !(this.getEndTime().isBefore(another.getStartTime())
+                    || this.getStartTime().isAfter(another.getEndTime()));
+        }
     }
 }

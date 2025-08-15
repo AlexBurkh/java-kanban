@@ -1,11 +1,9 @@
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private ArrayList<Integer> subtasksId;
-    private Duration duration;
     private LocalDateTime endTime;
 
     @Override
