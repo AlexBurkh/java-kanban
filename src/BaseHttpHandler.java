@@ -17,7 +17,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
     protected static final int OK = 200;
     protected static final int ADDED = 201;
     protected static final int CLIENT_ERROR = 400;
-    protected static final int NOT_FOUNT = 404;
+    protected static final int NOT_FOUND = 404;
     protected static final int OVERLAPS = 406;
     protected static final int INTERNAL_ERROR = 500;
 
@@ -56,7 +56,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
     }
 
     protected void sendNotFound(HttpExchange e) throws IOException {
-        send(e, NOT_FOUNT, "");
+        send(e, NOT_FOUND, "");
     }
 
     protected void sendHasOverlaps(HttpExchange e) throws IOException {
